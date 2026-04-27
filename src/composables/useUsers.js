@@ -69,8 +69,13 @@ function logout() {
 // =========================
 
 function register(newUser) {
-    const exists = users.value.find(u => u.login === newUser.login)
+    var exists = users.value.find(function(u) {
+    return u.login === newUser.login
+    })
     if (exists) return false
+
+  // глубокое клонирование defaultMedia
+  var userMediaCopy = JSON.parse(JSON.stringify(defaultMedia))
 
     const user = {
         id: users.value.length + 1,
@@ -78,9 +83,7 @@ function register(newUser) {
         password: newUser.password,
         name: newUser.name || "",
         role: "user",
-
-        // мы делаем копию из дефолт медиа, оно у нас не меняется
-        media: structuredClone(defaultMedia)
+        media: userMediaCopy
     }
 
     users.value.push(user)
