@@ -187,23 +187,36 @@ function goBack() {
     flex-direction: column;
     gap: 20px;
 
-    font-family: Arial;
+    font-family: Arial, sans-serif;
+    color: #ffffff;
 }
 
 
 .page>button {
     align-self: flex-start;
     cursor: pointer;
+    background: #1a1a1a;
+  border: 1px solid #333;
+  color: #ccc;
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+.page > button:hover {
+  background: #2a2a2a;
+  border-color: #68a61c;
 }
 
 .page h1,
 .page h2 {
     margin: 0;
+    color: #ffffff;
 }
 
 
 .page p {
     margin: 4px 0;
+    color: #ccc;
 }
 
 
@@ -211,7 +224,6 @@ function goBack() {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-
     margin-top: 12px;
 }
 
@@ -221,11 +233,16 @@ function goBack() {
     width: 100%;
     padding: 8px;
     margin: 6px 0;
-
-    border: 1px solid #ddd;
+    border: 1px solid #333;
     border-radius: 6px;
+    background: #1a1a1a;
+    color: #ffffff;
 }
 
+.page input:focus, .page select:focus {
+  outline: none;
+  border-color: #68a61c;
+}
 
 .page .edit-group {
     display: flex;
