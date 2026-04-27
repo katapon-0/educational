@@ -73,7 +73,7 @@ function isOverdue() {
       <!-- ПРОГРЕСС -->
       <!-- ========================= -->
       <p v-if="item.type === 'series'">
-        📺 Прогресс: {{ item.progress }} / {{ item.totalEpisodes }}
+        Прогресс: {{ item.progress }} / {{ item.totalEpisodes }}
         <!-- ДОБАВЛЕНО 2: кнопка прогресса -->
         <button @click="incProgress" :disabled="item.progress >= item.totalEpisodes">+</button>
       </p>
@@ -117,7 +117,6 @@ function isOverdue() {
 }
 
 .card:hover {
-  transform: translateY(-2px);
   border-color: #68a61c;
 }
 
@@ -153,9 +152,7 @@ function isOverdue() {
 }
 
 .buttons button {
-  padding: 4px 8px;
-  font-size: 12px;
-  border-radius: 4px;
+  border-radius: 20px;
   cursor: pointer;
   transition: all 0.2s;
 }
