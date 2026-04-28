@@ -7,9 +7,9 @@ const emit = defineEmits(["close"])
 const { addMediaToUser } = useUsers()
 
 // =========================
-// СОСТОЯНИЕ РАЗР 2 
+// СОСТОЯНИЕ
 // =========================
-const mode = ref("select") // 'select' или 'manual'
+const mode = ref("select")
 const selectedId = ref(null)
 
 const manualForm = ref({
@@ -21,40 +21,33 @@ const manualForm = ref({
   totalEpisodes: null
 })
 
-const baseItems = defaultMedia
-
 // =========================
-// ДОБАВЛЕНИЕ ИЗ БАЗЫ
+// ДОБАВЛЕНИЕ ИЗ БАЗЫ/ теперь через find
 // =========================
 function addSelected() {
   if (!selectedId.value) return
 
-  var selected = null
-  for (var i = 0; i < baseItems.length; i++) {
-    if (baseItems[i].id === selectedId.value) {
-      selected = baseItems[i]
-      break
-    }
+  const selected = defaultMedia.find(item => item.id === selectedId.value)
+  if (!selected) return
+
+  // базовая структура
+  const newItem = {
+    title: selected.title,
+    type: selected.type,
+    description: selected.description || "",
+    watchDate: selected.watchDate || null,
+    link: selected.link || null
   }
 
-  if (selected) {
-    var newItem = {
-      title: selected.title,
-      type: selected.type,
-      description: selected.description || "",
-      watchDate: selected.watchDate || null,
-      link: selected.link || null
-    }
-
-    if (selected.type === "series") {
-      newItem.totalEpisodes = selected.totalEpisodes
-    } else {
-      newItem.duration = selected.duration
-    }
-
-    addMediaToUser(newItem)
-    emit("close")
+  // добавляем специфичные поля
+  if (selected.type === "series") {
+    newItem.totalEpisodes = selected.totalEpisodes
+  } else {
+    newItem.duration = selected.duration
   }
+
+  addMediaToUser(newItem)
+  emit("close")
 }
 
 // =========================
@@ -63,13 +56,12 @@ function addSelected() {
 function addManual() {
   if (!manualForm.value.title) return
 
-  var newItem = {
+  const newItem = {
     title: manualForm.value.title,
     type: manualForm.value.type,
     watchDate: manualForm.value.watchDate || null,
     link: manualForm.value.link || null,
-    description: "",
-    image: null
+    description: ""
   }
 
   if (manualForm.value.type === "series") {
@@ -102,7 +94,7 @@ function addManual() {
         <div v-if="mode === 'select'">
           <select v-model="selectedId">
             <option disabled value="">Выберите...</option>
-            <option v-for="item in baseItems" :key="item.id" :value="item.id">
+            <option v-for="item in defaultMedia" :key="item.id" :value="item.id">
               {{ item.title }} ({{ item.type === "series" ? "Сериал" : "Фильм" }})
             </option>
           </select>
@@ -115,20 +107,16 @@ function addManual() {
         <!-- РУЧНОЕ ДОБАВЛЕНИЕ -->
         <div v-else>
           <input v-model="manualForm.title" placeholder="Название *" />
-          
           <select v-model="manualForm.type">
             <option value="film">Фильм</option>
             <option value="series">Сериал</option>
           </select>
-          
           <input type="date" v-model="manualForm.watchDate" placeholder="Дата просмотра" />
-          
           <input v-model="manualForm.link" placeholder="Ссылка" />
 
           <div v-if="manualForm.type === 'film'">
             <input type="number" v-model="manualForm.duration" placeholder="Длительность (мин)" />
           </div>
-          
           <div v-else>
             <input type="number" v-model="manualForm.totalEpisodes" placeholder="Количество серий" />
           </div>
@@ -144,6 +132,7 @@ function addManual() {
 </template>
 
 <style scoped>
+/* тёмная тема, как в предыдущих компонентах */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -233,6 +222,11 @@ input::placeholder {
   background: #4c7a14;
 }
 
+.actions button:first-child:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .actions button:last-child {
   background: #333;
   color: #ccc;
@@ -244,10 +238,5 @@ input::placeholder {
 
 .actions button:last-child:hover {
   background: #444;
-}
-
-.actions button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 </style>

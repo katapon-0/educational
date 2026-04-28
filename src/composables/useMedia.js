@@ -49,7 +49,7 @@ function addMedia(item) {
         id: maxId + 1,
         title: item.title,
         type: item.type, // филм или сериал
-        watchDate: null,
+        watchDate: item.watchDate || null,
         link: item.link || null,
 
         // сериал

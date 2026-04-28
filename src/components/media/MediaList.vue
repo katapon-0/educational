@@ -3,7 +3,16 @@ import { computed, ref } from "vue"
 import MediaCard from "./MediaCard.vue"
 import { useMedia } from "../../composables/useMedia"
 
-const { media, deleteMedia, filterByType, filterByStatus, sortByDate, getOverdue, statuses, statusLabels } = useMedia()
+// ПРИНИМАЕМ СПИСОК ОТ РОДИТЕЛЯ
+const props = defineProps({
+  items: {
+    type: Array,
+    default: () => []
+  }
+})
+const emit = defineEmits(["delete"])
+
+const { filterByType, filterByStatus, sortByDate, getOverdue, statuses, statusLabels } = useMedia()
 
 const filter = ref("all")
 const typeFilter = ref("all")
@@ -11,17 +20,20 @@ const statusFilter = ref("all")
 const sortType = ref("date-asc")
 
 const filteredMedia = computed(function() {
-  let list = media.value
+  let list = props.items   // ← используем ПРОП, а не глобальный media
 
+  // старый фильтр по типу (фильмы/сериалы)
   if (filter.value === "series") {
     list = list.filter(function(m) { return m.type === "series" })
   } else if (filter.value === "film") {
     list = list.filter(function(m) { return m.type === "film" })
   }
 
+  // новые фильтры
   list = filterByType(list, typeFilter.value)
   list = filterByStatus(list, statusFilter.value)
 
+  // сортировка
   if (sortType.value === "date-asc") {
     list = sortByDate(list, "asc")
   } else if (sortType.value === "date-desc") {
@@ -73,7 +85,7 @@ const filteredMedia = computed(function() {
         v-for="item in filteredMedia"
         :key="item.id"
         :item="item"
-        @delete="deleteMedia"
+        @delete="emit('delete', item.id)"
       />
     </div>
   </div>

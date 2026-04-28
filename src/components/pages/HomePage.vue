@@ -2,21 +2,17 @@
 import { computed } from "vue"
 import { useRouter } from "vue-router"
 import { useUsers } from "../../composables/useUsers"
-import MediaList from "../Media/MediaList.vue"
 import { useMedia } from "../../composables/useMedia"
 import { ref } from "vue"
+import MediaList from "../Media/MediaList.vue"
 import AddItemModal from "../Media/AddItemModal.vue"
 
 const router = useRouter()
-const { currentUser, logout } = useUsers()
+const { currentUser, logout, userMedia, deleteMediaFromUser } = useUsers()
 const { getStats, getSuggestion } = useMedia()
 
 const userName = computed(function() {
   return currentUser.value?.name || currentUser.value?.login
-})
-
-const userMedia = computed(function() {
-  return currentUser.value?.media ?? []
 })
 
 const stats = computed(function() {
@@ -45,6 +41,11 @@ function openAddModal() {
 function closeAddModal() {
   addModalVisible.value = false
 }
+
+// функция удаления
+function handleDelete(id) {
+  deleteMediaFromUser(id)
+}
 </script>
 
 <template>
@@ -57,7 +58,7 @@ function closeAddModal() {
 
     <div v-else>
       <header class="header">
-        <h1>My Media List</h1>
+        <h1>🎬 WatchList</h1>
         <div class="user-info">
           <span class="username">👤 {{ userName }}</span>
           <button @click="handleLogout" class="btn-logout">Выйти</button>
@@ -73,7 +74,7 @@ function closeAddModal() {
       </div>
 
       <div class="suggestion">
-        <button @click="refreshSuggestion" class="btn-suggestion">Что посмотреть ?</button>
+        <button @click="refreshSuggestion" class="btn-suggestion">🎯 Что посмотреть ?</button>
         <div v-if="suggestion" class="suggestion-card">
           <strong>{{ suggestion.title }}</strong> ({{ suggestion.type === "series" ? "Сериал" : "Фильм" }})
           <span v-if="suggestion.watchDate"> — 📅 {{ new Date(suggestion.watchDate).toLocaleDateString() }}</span>
@@ -88,7 +89,8 @@ function closeAddModal() {
         <p>Нажмите «+ Добавить», чтобы начать</p>
       </div>
 
-      <MediaList v-else />
+      <!-- ПЕРЕДАЁМ СПИСОК И ОБРАБОТЧИК УДАЛЕНИЯ -->
+      <MediaList :items="userMedia" @delete="handleDelete" v-else />
 
       <AddItemModal v-if="addModalVisible" @close="closeAddModal" />
     </div>
