@@ -131,27 +131,44 @@ function updateUserMedia(mediaList) {
 // =========================
 
 function addMediaToUser(item) {
-    if (!currentUser.value) return
+    if (!currentUser.value) {
+        console.error("Нет текущего пользователя")
+        return
+    }
 
     const media = currentUser.value.media
+    if (!Array.isArray(media)) {
+        console.error("media не массив", media)
+        return
+    }
 
-    const maxId = media.length
-        ? Math.max(...media.map(m => m.id))
-        : 0
+    // безопасное вычисление maxId
+    let maxId = 0
+    for (let i = 0; i < media.length; i++) {
+        const id = media[i].id
+        if (typeof id === "number" && id > maxId) maxId = id
+    }
 
-    media.push({
+    const newItem = {
         id: maxId + 1,
-        title: item.title,
-        type: item.type,
-        watchDate: null,
+        title: item.title || "Без названия",
+        type: item.type || "film",
+        description: item.description || "",
+        status: item.status || "want",
+        watchDate: item.watchDate || null,    // исправлено
         link: item.link || null,
         episodeDuration: item.episodeDuration || null,
         totalEpisodes: item.totalEpisodes || null,
+        duration: item.duration || null,
         progress: 0,
         image: item.image || null
-    })
+    }
 
-    updateUserMedia(media)
+    console.log("Добавляем:", newItem)
+
+    // создаём новый массив, чтобы реактивность сработала
+    const newMedia = [...media, newItem]
+    updateUserMedia(newMedia)
 }
 
 function deleteMediaFromUser(id) {
