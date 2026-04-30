@@ -110,155 +110,221 @@ function goBack() {
 </script>
 
 <template>
-    <div v-if="item" class="page">
+  <div class="page" v-if="item">
 
-        <!-- НАВИГАЦИЯ -->
-        <button @click="goBack">← назад</button>
+    <button class="btn-back" @click="goBack">← назад</button>
 
-        <!-- ========================= -->
-        <!-- VIEW MODE -->
-        <!-- ========================= -->
-        <div v-if="!isEditing">
+    <!-- VIEW -->
+    <div v-if="!isEditing" class="card">
 
-            <h1>{{ item.title }}</h1>
+      <h1>{{ item.title }}</h1>
 
-            <p>Тип: {{ item.type }}</p>
+      <p class="meta">Тип: {{ item.type }}</p>
 
-            <p v-if="item.type === 'series'">
-                {{ item.progress }} / {{ item.totalEpisodes }}
-            </p>
+      <p v-if="item.type === 'series'" class="meta">
+        {{ item.progress }} / {{ item.totalEpisodes }}
+      </p>
 
-            <p v-else>
-                {{ item.episodeDuration }} мин
-            </p>
+      <p v-else class="meta">
+        {{ item.episodeDuration }} мин
+      </p>
 
-            <div class="buttons">
-                <button @click="increaseProgress">+ прогресс</button>
-                <button @click="startEdit">редактировать</button>
-                <button @click="remove">удалить</button>
-            </div>
+      <div class="buttons">
+        <button class="btn-accent" @click="increaseProgress">
+          + прогресс
+        </button>
 
-        </div>
+        <button class="btn-dark" @click="startEdit">
+          редактировать
+        </button>
 
-        <!-- ========================= -->
-        <!-- EDIT MODE -->
-        <!-- ========================= -->
-        <div v-else>
-
-            <h2>Редактирование</h2>
-
-            <input v-model="form.title" placeholder="Название" />
-
-            <select v-model="form.type">
-                <option value="series">Сериал</option>
-                <option value="film">Фильм</option>
-            </select>
-
-            <div v-if="form.type === 'series'">
-                <input v-model="form.progress" type="number" placeholder="Прогресс" />
-                <input v-model="form.totalEpisodes" type="number" placeholder="Эпизоды" />
-            </div>
-
-            <div v-else>
-                <input v-model="form.episodeDuration" type="number" placeholder="Длительность" />
-            </div>
-
-            <div class="buttons">
-                <button @click="save">сохранить</button>
-                <button @click="cancelEdit">отмена</button>
-            </div>
-
-        </div>
+        <button class="btn-danger" @click="remove">
+          удалить
+        </button>
+      </div>
 
     </div>
 
-    <div v-else>
-        <p>Медиа не найдено</p>
+    <!-- EDIT -->
+    <div v-else class="card">
+
+      <h2>Редактирование</h2>
+
+      <input v-model="form.title" placeholder="Название" />
+
+      <select v-model="form.type">
+        <option value="series">Сериал</option>
+        <option value="film">Фильм</option>
+      </select>
+
+      <div v-if="form.type === 'series'">
+        <input v-model="form.progress" type="number" placeholder="Прогресс" />
+        <input v-model="form.totalEpisodes" type="number" placeholder="Эпизоды" />
+      </div>
+
+      <div v-else>
+        <input v-model="form.episodeDuration" type="number" placeholder="Длительность" />
+      </div>
+
+      <div class="buttons">
+        <button class="btn-accent" @click="save">сохранить</button>
+        <button class="btn-dark" @click="cancelEdit">отмена</button>
+      </div>
+
     </div>
+
+  </div>
+
+  <div v-else class="empty">
+    <p>Медиа не найдено</p>
+  </div>
 </template>
 
 <style scoped>
 .page {
-    max-width: 720px;
-    margin: 40px auto;
-    padding: 0 16px;
+  max-width: 720px;
+  margin: 40px auto;
+  padding: 0 16px;
 
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+  font-family: Arial, sans-serif;
+  color: #1a172c;
 
-    font-family: Arial, sans-serif;
-    color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
+.btn-back {
+  align-self: flex-start;
 
-.page>button {
-    align-self: flex-start;
-    cursor: pointer;
-    background: #1a1a1a;
-  border: 1px solid #333;
-  color: #ccc;
+  background: transparent;
+  color: #1a172c;
+
+  border: 1px solid #e5e5e5;
   padding: 6px 12px;
-  border-radius: 6px;
+  border-radius: 8px;
+
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.page > button:hover {
-  background: #2a2a2a;
-  border-color: #68a61c;
+.btn-back:hover {
+  background: #fdeabf;
+  border-color: #fdb688;
+  transform: translateY(-1px);
 }
 
-.page h1,
-.page h2 {
-    margin: 0;
-    color: #ffffff;
+.card {
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 16px;
+
+  padding: 16px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  transition: all 0.2s;
 }
 
-
-.page p {
-    margin: 4px 0;
-    color: #ccc;
+.card:hover {
+  transform: translateY(-2px);
 }
 
+.card h1,
+.card h2 {
+  margin: 0;
+  color: #1a172c;
+}
+
+.meta {
+  opacity: 0.7;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 10px 12px;
+
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+
+  background: #fefefe;
+  color: #1a172c;
+
+  transition: all 0.2s;
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  border-color: #fdb688;
+  box-shadow: 0 0 0 3px rgba(253, 184, 136, 0.25);
+}
 
 .buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
 }
 
+.btn-accent {
+  background: #fdb688;
+  color: #1a172c;
 
-.page input,
-.page select {
-    width: 100%;
-    padding: 8px;
-    margin: 6px 0;
-    border: 1px solid #333;
-    border-radius: 6px;
-    background: #1a1a1a;
-    color: #ffffff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.page input:focus, .page select:focus {
-  outline: none;
-  border-color: #68a61c;
+.btn-accent:hover {
+  background: #fdeabf;
+  transform: translateY(-1px);
 }
 
-.page .edit-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+.btn-dark {
+  background: #1a172c;
+  color: #fefefe;
+
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-
-.page>div {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+.btn-dark:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
 }
 
+.btn-danger {
+  background: transparent;
+  color: #1a172c;
 
-.page {
-    min-height: 60vh;
+  border: 1px solid #e5e5e5;
+  padding: 6px 14px;
+  border-radius: 8px;
+
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-danger:hover {
+  background: #fdeabf;
+  border-color: #fdb688;
+  transform: translateY(-1px);
+}
+ 
+.empty {
+  text-align: center;
+  padding: 60px;
+  opacity: 0.5;
 }
 </style>

@@ -116,16 +116,75 @@ function submit() {
 </template>
 
 <style scoped>
+.form {
+  width: 100%;
+  max-width: 360px;
+  padding: 22px;
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 18px;
+  box-shadow: 0 6px 18px rgba(26, 23, 44, 0.06);
+
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  color: #1a172c;
+  font-family: Arial, sans-serif;
+}
+
+
+.form h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #1a172c;
+}
+
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
+input {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #e5e5e5;
+  background: #fefefe;
+  color: #1a172c;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+input:focus {
+  outline: none;
+  border-color: #fdb688;
+  box-shadow: 0 0 0 3px rgba(253, 184, 136, 0.25);
+}
 
 .error {
-  color: red;
+  color: #b24a4a;
   font-size: 12px;
+  margin: 0;
+}
+
+button {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: none;
+
+  background: #1a172c;
+  color: #fefefe;
+
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+
+button:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
 }
 </style>

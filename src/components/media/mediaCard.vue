@@ -75,7 +75,7 @@ function isOverdue() {
       <p v-if="item.type === 'series'">
         Прогресс: {{ item.progress }} / {{ item.totalEpisodes }}
         <!-- ДОБАВЛЕНО 2: кнопка прогресса -->
-        <button @click="incProgress" :disabled="item.progress >= item.totalEpisodes">+</button>
+        <button @click="incProgress" :disabled="item.progress >= item.totalEpisodes" class="progress-btn">+</button>
       </p>
 
       <p v-else>
@@ -104,27 +104,33 @@ function isOverdue() {
 <style scoped>
 .card {
   display: flex;
-  gap: 12px;
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid #333;
-  transition: 0.2s;
-}
-
-.card.overdue {
-  background-color: #2a1515;
-  border-color: #ff4444;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid #e5e5e5;
+  background: #fefefe;
+  color: #1a172c;
+  transition: all 0.2s ease;
 }
 
 .card:hover {
-  border-color: #68a61c;
+  border-color: #1a172c;
+  box-shadow: 0 6px 18px rgba(26, 23, 44, 0.08);
+  transform: translateY(-1px);
+}
+
+.card.overdue {
+  background: #fdeabf;
+  border-color: #fdb688;
 }
 
 .cover {
   width: 80px;
   height: 110px;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  border: 1px solid #e5e5e5;
 }
 
 .info {
@@ -132,16 +138,32 @@ function isOverdue() {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
 }
 
 .info h3 {
-  color: #ffffff;
+  color: #1a172c;
+  margin: 0;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.type,
+.status,
+.info p {
+  font-size: 13px;
+  color: rgba(26, 23, 44, 0.72);
   margin: 0;
 }
 
-.type, .status {
-  font-size: 12px;
-  color: #888;
+.status {
+  display: inline-flex;
+  width: fit-content;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #fdeabf;
+  color: #1a172c;
+  font-weight: 600;
 }
 
 .buttons {
@@ -152,50 +174,58 @@ function isOverdue() {
 }
 
 .buttons button {
-  border-radius: 20px;
+  border-radius: 999px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+  padding: 6px 12px;
+  border: 1px solid transparent;
+  font-size: 13px;
 }
 
 .btn-open {
-  background: #333;
-  color: #fff;
-  border: none;
+  background: #1a172c;
+  color: #fefefe;
+  border-color: #1a172c;
 }
 
 .btn-open:hover {
-  background: #68a61c;
+  opacity: 0.92;
 }
 
 .status-btn {
-  background: #2a2a2a;
-  color: #ccc;
-  border: 1px solid #444;
+  background: #fefefe;
+  color: #1a172c;
+  border-color: #dcdcdc;
 }
 
 .status-btn:hover {
-  background: #68a61c;
-  color: #fff;
-  border-color: #68a61c;
+  background: #fdeabf;
+  border-color: #fdb688;
 }
 
 .btn-delete {
-  background: #3a1a1a;
-  color: #ff6666;
-  border: 1px solid #662222;
+  background: #fefefe;
+  color: #1a172c;
+  border-color: #dcdcdc;
 }
 
 .btn-delete:hover {
-  background: #662222;
-  color: #ff8888;
+  background: #fdeabf;
+  border-color: #fdb688;
 }
 
 .progress-btn {
-  background: #68a61c;
-  color: #fff;
+ 
   border: none;
   margin-left: 4px;
-  padding: 2px 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.progress-btn:hover {
+  background: #fdeabf;
 }
 
 .progress-btn:disabled {

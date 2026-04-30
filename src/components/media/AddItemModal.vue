@@ -132,32 +132,35 @@ function addManual() {
 </template>
 
 <style scoped>
-/* тёмная тема, как в предыдущих компонентах */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(26, 23, 44, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  backdrop-filter: blur(4px);
 }
 
 .modal {
-  background: #1a1a1a;
+  background: #fefefe;
   padding: 24px;
-  border-radius: 16px;
-  width: 400px;
-  max-width: 90%;
-  border: 1px solid #333;
+  border-radius: 18px;
+  width: 420px;
+  max-width: 92%;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 10px 30px rgba(26, 23, 44, 0.12);
+  color: #1a172c;
 }
 
 .modal h3 {
-  color: #ffffff;
-  margin: 0 0 10px 0;
+  color: #1a172c;
+  margin: 0 0 12px 0;
+  font-size: 20px;
 }
 
 .tabs {
@@ -168,58 +171,69 @@ function addManual() {
 
 .tabs button {
   flex: 1;
-  padding: 8px;
-  border: none;
-  background: #2a2a2a;
-  color: #cccccc;
+  padding: 9px;
+  border: 1px solid #e5e5e5;
+  background: transparent;
+  color: #1a172c;
   cursor: pointer;
-  border-radius: 6px;
+  border-radius: 10px;
   transition: all 0.2s;
 }
 
-.tabs button.active {
-  background: #68a61c;
-  color: #ffffff;
+.tabs button:hover {
+  background: #fdeabf;
+  border-color: #fdb688;
 }
 
-select, input {
+.tabs button.active {
+  background: #1a172c;
+  color: #fefefe;
+  border-color: #1a172c;
+}
+select,
+input {
   width: 100%;
   margin: 8px 0;
-  padding: 10px;
+  padding: 10px 12px;
   box-sizing: border-box;
-  background: #2a2a2a;
-  border: 1px solid #444;
-  border-radius: 6px;
-  color: #ffffff;
+  background: #fefefe;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  color: #1a172c;
+  transition: all 0.2s;
 }
 
-select:focus, input:focus {
+select:focus,
+input:focus {
   outline: none;
-  border-color: #68a61c;
+  border-color: #fdb688;
+  box-shadow: 0 0 0 3px rgba(253, 184, 136, 0.25);
 }
 
 input::placeholder {
-  color: #888;
+  color: rgba(26, 23, 44, 0.5);
 }
 
 .actions {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  margin-top: 16px;
+  gap: 10px;
+  margin-top: 18px;
 }
 
+
 .actions button:first-child {
-  background: #68a61c;
-  color: white;
+  background: #fdb688;
+  color: #1a172c;
   border: none;
-  border-radius: 6px;
-  padding: 8px 16px;
+  border-radius: 10px;
+  padding: 8px 14px;
   cursor: pointer;
+  transition: all 0.2s;
 }
 
 .actions button:first-child:hover {
-  background: #4c7a14;
+  background: #fdeabf;
 }
 
 .actions button:first-child:disabled {
@@ -227,16 +241,19 @@ input::placeholder {
   cursor: not-allowed;
 }
 
+
 .actions button:last-child {
-  background: #333;
-  color: #ccc;
-  border: none;
-  border-radius: 6px;
-  padding: 8px 16px;
+  background: transparent;
+  color: #1a172c;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  padding: 8px 14px;
   cursor: pointer;
+  transition: all 0.2s;
 }
 
 .actions button:last-child:hover {
-  background: #444;
+  background: #fdeabf;
+  border-color: #fdb688;
 }
 </style>

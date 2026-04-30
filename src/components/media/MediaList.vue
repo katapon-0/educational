@@ -99,52 +99,65 @@ const filteredMedia = computed(function() {
   gap: 10px;
   margin-bottom: 20px;
   align-items: center;
-  background: #0d0d0d;
+
+  background: #fefefe;
   padding: 12px;
   border-radius: 12px;
-  border: 1px solid #2a2a2a;
+  border: 1px solid #e8e8e8;
 }
 
 .filters button {
-  padding: 5px 12px;
-  border: 1px solid #333;
+  padding: 6px 14px;
+  border: 1px solid #e0e0e0;
   border-radius: 20px;
-  background: #1a1a1a;
-  color: #ccc;
+
+  background: transparent;
+  color: #1a172c;
+
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 .filters button:hover {
-  background: #2a2a2a;
-  border-color: #68a61c;
+  background: #fdeabf;
+  border-color: #fdb688;
 }
 
 .filters button.active {
-  background: #68a61c;
-  color: #ffffff;
-  border-color: #68a61c;
+  background: #fdb688;
+  color: #1a172c;
+  border-color: #fdb688;
 }
 
 .separator {
   width: 1px;
   height: 24px;
-  background: #333;
+  background: #e0e0e0;
   margin: 0 4px;
 }
 
 .sort-select {
-  padding: 5px 10px;
-  background: #1a1a1a;
-  color: #ccc;
-  border: 1px solid #333;
+  padding: 6px 12px;
+
+  background: transparent;
+  color: #1a172c;
+
+  border: 1px solid #e0e0e0;
   border-radius: 20px;
+
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sort-select:hover {
+  border-color: #fdb688;
+  background: #fdeabf;
 }
 
 .sort-select:focus {
   outline: none;
-  border-color: #68a61c;
+  border-color: #fdb688;
+  background: #fdeabf;
 }
 
 .grid {

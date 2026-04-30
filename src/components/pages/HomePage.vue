@@ -98,11 +98,12 @@ function handleDelete(id) {
 </template>
 
 <style scoped>
-.home {
+  .home {
   padding: 20px;
-  color: #ffffff;
+  color: #1a172c;
   font-family: Arial, sans-serif;
   min-height: 100vh;
+  background: #fefefe;
 }
 
 .header {
@@ -112,52 +113,56 @@ function handleDelete(id) {
   flex-wrap: wrap;
   gap: 15px;
   margin-bottom: 20px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #2a2a2a;
+  padding: 16px 18px;
+  background: #1a172c;
+  border-radius: 18px;
+  border: 1px solid #1a172c;
 }
 
 .header h1 {
   margin: 0;
-  color: #ffffff;
+  color: #fefefe;
 }
 
 .user-info {
   display: flex;
   gap: 12px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .username {
-  color: #68a61c;
+  color: #fefefe;
+  opacity: 0.9;
 }
 
 .btn-logout {
-  background: #2a2a2a;
-  color: #ccc;
-  border: 1px solid #444;
+  background: transparent;
+  color: #fefefe;
+  border: 1px solid rgba(254, 254, 254, 0.28);
   padding: 6px 12px;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .btn-logout:hover {
-  background: #3a3a3a;
-  color: #fff;
+  background: rgba(253, 234, 191, 0.16);
+  border-color: #fdeabf;
 }
 
 .btn-add {
-  background: #68a61c;
-  color: white;
+  background: #fdb688;
+  color: #1a172c;
   border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .btn-add:hover {
-  background: #4c7a14;
+  background: #fdeabf;
   transform: translateY(-1px);
 }
 
@@ -169,31 +174,34 @@ function handleDelete(id) {
 }
 
 .stat-card {
-  background: #1a1a1a;
+  background: #ffffff;
   padding: 8px 16px;
   border-radius: 20px;
-  border: 1px solid #333;
-  color: #ccc;
+  border: 1px solid #e5e5e5;
+  color: #1a172c;
 }
 
 .suggestion {
-  background: #0d0d0d;
+  background: #ffffff;
   padding: 16px;
   border-radius: 12px;
   margin-bottom: 20px;
+  border: 1px solid #e5e5e5;
 }
 
 .btn-suggestion {
-  background: #68a61c;
-  color: white;
+  background: #fdb688;
+  color: #1a172c;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
+  padding: 8px 14px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 15px;
+  transition: all 0.2s;
 }
 
 .btn-suggestion:hover {
-  background: #4c7a14;
+  opacity: 0.92;
 }
 
 .suggestion-card {
@@ -202,45 +210,49 @@ function handleDelete(id) {
   gap: 12px;
   align-items: center;
   flex-wrap: wrap;
-  padding: 15px;
-  background: #1a1a1a;
-  border-radius: 8px;
+  padding: 12px;
+  background: #fdeabf;
+  border-radius: 10px;
 }
 
 .btn-link {
-  color: #ccc;
-  border: none;
-  padding: 8px 16px;
+  color: #1a172c;
+  border: 1px solid #ddd;
+  padding: 6px 12px;
   cursor: pointer;
-  background: #0d0d0d;
+  background: transparent;
+  border-radius: 8px;
+  transition: all 0.2s;
 }
 
 .btn-link:hover {
-  color: #fff;
-  background: #68a61c;
+  background: #fdeabf;
+  border-color: #fdb688;
 }
 
 .divider {
-  border-color: #2a2a2a;
-  margin: 15px 0;
+  border: none;
+  border-top: 1px solid #e5e5e5;
+  margin: 20px 0;
 }
 
 .empty-state {
   text-align: center;
   padding: 60px;
-  color: #888;
+  color: #1a172c;
+  opacity: 0.5;
 }
 
 .btn-primary {
-  background: #68a61c;
-  color: white;
+  background: #1a172c;
+  color: #fefefe;
   border: none;
   padding: 10px 20px;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
 }
 
 .btn-primary:hover {
-  background: #4c7a14;
+  opacity: 0.92;
 }
 </style>
