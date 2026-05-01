@@ -9,7 +9,12 @@ const props = defineProps({
 const emit = defineEmits(["delete"])
 
 const router = useRouter()
-const { updateStatus, statusLabels, increaseProgress } = useMedia()
+const { updateStatus, statusLabels, increaseProgress, updateMedia } = useMedia()
+
+function markFilmWatched() {
+    changeStatus('done')
+    router.push('/')  
+}
 
 // =========================
 // ОТКРЫТЬ СТРАНИЦУ
@@ -42,6 +47,17 @@ function isOverdue() {
   today.setHours(0, 0, 0, 0)
   var watchDate = new Date(props.item.watchDate)
   return watchDate < today
+}
+
+// уменьшение прогресса (только для сериалов) с возвратом в "хочу посмотреть" при 0
+function decProgress() {
+  if (props.item.type !== 'series') return
+  let newProgress = (props.item.progress || 0) - 1
+  if (newProgress < 0) newProgress = 0
+  updateMedia(props.item.id, { progress: newProgress })
+  if (newProgress === 0) {
+    updateStatus(props.item.id, 'want')
+  }
 }
 
 </script>
@@ -79,14 +95,11 @@ function isOverdue() {
         Прогресс: {{ item.progress || 0 }} / {{ item.totalEpisodes ? item.totalEpisodes : '?' }}
         <!-- отключить +, если значение totalEpisodes отсутствует или достигнуто -->
         <!-- кнопка прогресса -->
-        <button
-          @click="incProgress"
-          :disabled="!item.totalEpisodes || item.progress >= item.totalEpisodes"
-          class="progress-btn"
-        >+</button>
+        <button @click="decProgress" class="progress-btn">–</button>
+        <button @click="incProgress" :disabled="!item.totalEpisodes || item.progress >= item.totalEpisodes" class="progress-btn">+</button>
       </p>
       <p v-else>
-        ⏱ {{ item.duration }} мин
+        ⏱ {{ item.duration || '?' }} мин       
       </p>
 
       <!-- ========================= -->
@@ -222,7 +235,6 @@ function isOverdue() {
 }
 
 .progress-btn {
- 
   border: none;
   margin-left: 4px;
   padding: 2px 8px;

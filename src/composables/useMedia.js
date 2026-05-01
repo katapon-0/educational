@@ -102,14 +102,21 @@ function setWatchDate(id, date) {
 // ПРОГРЕСС СЕРИАЛОВ
 // =========================
 function increaseProgress(id) {
-    var item = getMediaById(id)
-    if (item && item.type === "series" && item.progress < item.totalEpisodes) {
-        var newProgress = (item.progress || 0) + 1
+    const item = getMediaById(id)
+    if (!item || item.type !== "series") return
+    if (item.progress >= item.totalEpisodes) return
+
+    const newProgress = (item.progress || 0) + 1
+    // автоматическая настройка "просмотр" при просмотре первого эпизода
+    if (item.status === "want") {
+        updateMediaInUser(id, { status: "watching", progress: newProgress })
+    } else {
         updateMediaInUser(id, { progress: newProgress })
-        // автоматически помечает как выполненное, когда прогресс достигает 100%
-        if (newProgress >= item.totalEpisodes) {
-            updateStatus(id, 'done')
-        }
+    }
+
+    // автоматически помечает как выполненное, когда прогресс достигает 100%
+    if (newProgress >= item.totalEpisodes) {
+        updateStatus(id, "done")
     }
 }
 

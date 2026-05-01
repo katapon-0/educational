@@ -6,7 +6,7 @@ import { useMedia } from "../../composables/useMedia"
 const route = useRoute()
 const router = useRouter()
 
-const { getMediaById, updateMedia, deleteMedia } = useMedia()
+const { getMediaById, updateMedia, deleteMedia, increaseProgress, updateStatus } = useMedia()
 
 // =========================
 // ДАННЫЕ
@@ -84,12 +84,28 @@ function save() {
 // ПРОГРЕСС
 // =========================
 
-function increaseProgress() {
+function handleIncreaseProgress() {
     if (!item.value) return
+    if (item.value.type !== 'series') return
+    //  используем increaseProgress из composable (он теперь управляет статусами)
+    increaseProgress(item.value.id)
+    // переход на главную только при полном завершении
+    const updatedItem = getMediaById(item.value.id)
+    if (updatedItem && updatedItem.progress >= updatedItem.totalEpisodes) {
+        router.push('/')
+    }
+}
 
-    updateMedia(item.value.id, {
-        progress: (item.value.progress || 0) + 1
-    })
+// уменьшение прогресса (как в MediaCard)
+function handleDecreaseProgress() {
+    if (!item.value) return
+    if (item.value.type !== 'series') return
+    let newProgress = (item.value.progress || 0) - 1
+    if (newProgress < 0) newProgress = 0
+    updateMedia(item.value.id, { progress: newProgress })
+    if (newProgress === 0) {
+        updateStatus(item.value.id, 'want')
+    }
 }
 
 // =========================
@@ -104,7 +120,7 @@ function remove() {
 }
 
 // =========================
-// BACK
+// НАЗАД
 // =========================
 
 function goBack() {
@@ -112,8 +128,9 @@ function goBack() {
 }
 
 function markAsWatched() {
-  if (!item.value) return
-  updateMedia(item.value.id, { status: 'done' })
+    if (!item.value) return
+    updateMedia(item.value.id, { status: 'done' })
+    router.push('/')
 }
 </script>
 
@@ -127,14 +144,17 @@ function markAsWatched() {
 
       <h1>{{ item.title }}</h1>
       <img v-if="item.image" :src="item.image" class="detail-image" />
-      <p class="meta">Тип: {{ item.type }}</p>
+      <p v-if="item.description" class="description">{{ item.description }}</p>
+      <p class="meta">{{ item.type === 'series' ? 'Сериал' : 'Фильм' }}</p>
 
       <p v-if="item.type === 'series'" class="meta">
         {{ item.progress || 0 }} / {{ item.totalEpisodes ? item.totalEpisodes : '?' }}
       </p>
-      <p v-else class="meta">{{ item.episodeDuration }} мин</p>
+      <p v-else class="meta">{{ item.episodeDuration || item.duration || '?' }} мин</p>
       <div class="buttons">
-        <button v-if="item.type === 'series'" class="btn-accent" @click="increaseProgress">+ прогресс</button>
+        <!-- кнопка минус для сериалов -->
+        <button v-if="item.type === 'series'" class="btn-accent" @click="handleDecreaseProgress">–</button>
+        <button v-if="item.type === 'series'" class="btn-accent" @click="handleIncreaseProgress">+</button>
         <button v-else class="btn-accent" @click="markAsWatched">✔ Просмотрено</button>
         <button class="btn-dark" @click="startEdit">редактировать</button>
         <button class="btn-danger" @click="remove">удалить</button>
@@ -158,7 +178,7 @@ function markAsWatched() {
       <input v-model="form.image" placeholder="URL изображения" />
 
       <div v-if="form.type === 'series'">
-        <input v-model.number="form.progress" type="number" placeholder="Прогресс" />
+        <input v-model.number="form.progress" type="number" placeholder="Прогресс" :max="form.totalEpisodes" />
         <input v-model.number="form.totalEpisodes" type="number" placeholder="Всего эпизодов" />
       </div>
 
