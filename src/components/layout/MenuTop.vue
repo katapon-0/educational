@@ -1,142 +1,133 @@
 <script setup>
-
-// короче надо пофиксить добавление в этой шапке. я её перенесла, но я так намучалась с этими эмитами... по хорошему, надо шапку перенести в отдельный компонент, т.е. оставить её здесь. если у тебя не получится, мы оставим её отдельным блоком в homepage.vue.
-// выход работает, он меняет состояние в зависимости от авторизации. но добавить не работает кнопка.. остальное вроде рабочее.
-
-import { computed } from "vue"
+import { computed, ref } from "vue"
+import { useRouter } from "vue-router"
 import { useUsers } from "../../composables/useUsers"
+import AddItemModal from "../Media/AddItemModal.vue"  // модалка напрямую
 
+const router = useRouter()
 const { currentUser, logout } = useUsers()
-
-const emit = defineEmits(["open-add"])
 
 const userName = computed(() => {
   return currentUser.value?.name || currentUser.value?.login
 })
-
 const isAuth = computed(() => !!currentUser.value)
 
+// +управление модалкой добавления прямо в шапке
+const addModalVisible = ref(false)
+
+function goHome() {
+  router.push("/")
+}
+function goLogin() {
+  router.push("/login")
+}
 function handleLogout() {
   logout()
+  router.push("/login")
 }
-
 function openAddModal() {
-  emit("open-add")
+  addModalVisible.value = true
+}
+function closeAddModal() {
+  addModalVisible.value = false
 }
 </script>
 
 <template>
-  <header class="header">
-    <h1>🎬 WatchList</h1>
-
-    <div class="user-info">
-
-      <template v-if="isAuth">
-
-        <span class="username">👤 {{ userName }}</span>
-
-        <button class="btn-add" @click="openAddModal">
-          + Добавить
-        </button>
-
-        <button class="btn-logout" @click="handleLogout">
-          Выйти
-        </button>
-
-      </template>
-
-      <template v-else>
-
-        <button class="btn-logout" @click="goLogin">
-          Войти
-        </button>
-
-      </template>
-
+  <header class="topbar">
+    <div class="left">
+      <button class="brand" @click="goHome">WatchList</button>
+    </div>
+    <div class="right">
+      <div v-if="!isAuth" class="auth">
+        <button @click="goLogin" class="btn">Войти</button>
+      </div>
+      <div v-else class="user">
+        <span class="username">{{ userName }}</span>
+        <button @click="openAddModal" class="btn btn-accent">+ Добавить</button>
+        <button @click="handleLogout" class="btn">Выйти</button>
+      </div>
     </div>
   </header>
+  <!-- модалка добавления -->
+  <AddItemModal v-if="addModalVisible" @close="closeAddModal" />
 </template>
 
 <style scoped>
-
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-bottom: 20px;
-    padding: 16px 18px;
-    background: #1a172c;
-    border-radius: 18px;
-    border: 1px solid #1a172c;
-}
-
-.header h1 {
-    margin: 0;
-    color: #fefefe;
-}
-
-.user-info {
+.topbar {
+  width: 100%;
   display: flex;
-  gap: 12px;
+  justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
+  padding: 14px 20px;
+  background: #1a172c;
+  color: #fefefe;
+  border-radius: 0 0 14px 14px;
+  font-family: Arial;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+}
+
+.brand {
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.3px;
+  background: none;
+  border: none;
+  color: #fefefe;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+  transition: 0.2s;
+}
+.brand:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.right {
+  display: flex;
+  align-items: center;
+}
+
+.auth,
+.user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .username {
-  color: #fefefe;
-  opacity: 0.9;
+  font-size: 14px;
+  opacity: 0.8;
 }
 
-.btn-logout {
+.btn {
+  padding: 6px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
   background: transparent;
   color: #fefefe;
-  border: 1px solid rgba(254, 254, 254, 0.28);
-  padding: 6px 12px;
-  border-radius: 8px;
+  font-size: 13px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
+}
+.btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
-.btn-logout:hover {
-  background: rgba(253, 234, 191, 0.16);
-  border-color: #fdeabf;
-}
-
-.btn-add {
+.btn-accent {
   background: #fdb688;
   color: #1a172c;
   border: none;
-  padding: 6px 14px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
 }
-
-.btn-add:hover {
-  background: #fdeabf;
-  transform: translateY(-1px);
+.btn-accent:hover {
+  opacity: 0.9;
 }
-
-.empty-state {
-  text-align: center;
-  padding: 60px;
-  color: #1a172c;
-  opacity: 0.5;
-}
-
-.btn-primary {
-  background: #1a172c;
-  color: #fefefe;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.btn-primary:hover {
-  opacity: 0.92;
-}
-
 </style>

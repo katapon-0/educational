@@ -84,35 +84,33 @@ function submit() {
 <style scoped>
 .auth {
   width: 100%;
-  max-width: 360px;
-  padding: 22px;
+  max-width: 380px;
+  padding: 28px 24px;
   background: #ffffff;
   border: 1px solid #e5e5e5;
-  border-radius: 18px;
-  box-shadow: 0 6px 18px rgba(26, 23, 44, 0.06);
-
+  border-radius: 24px;
+  box-shadow: 0 8px 24px rgba(26, 23, 44, 0.08);
   display: flex;
   flex-direction: column;
-  gap: 14px;
-
+  gap: 18px;
   color: #1a172c;
   font-family: Arial, sans-serif;
+  margin: 0 auto; /* центрирование, если родитель не flex */
 }
-
 
 .auth h2 {
   margin: 0;
-  font-size: 20px;
+  font-size: 22px;
+  font-weight: 600;
+  text-align: center;
   color: #1a172c;
 }
-
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
-
 
 .field {
   display: flex;
@@ -121,53 +119,60 @@ function submit() {
 }
 
 input {
-  padding: 10px 12px;
-  border-radius: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
   border: 1px solid #e5e5e5;
   background: #fefefe;
   color: #1a172c;
-  transition: all 0.2s;
   font-size: 14px;
+  transition: all 0.2s;
+  outline: none;
 }
 
 input:focus {
-  outline: none;
   border-color: #fdb688;
   box-shadow: 0 0 0 3px rgba(253, 184, 136, 0.25);
 }
 
+input::placeholder {
+  color: rgba(26, 23, 44, 0.4);
+}
 
 .error {
   color: #b24a4a;
   font-size: 12px;
   margin: 0;
+  padding-left: 4px;
+}
+
+.error.general {
+  text-align: center;
+  margin-top: -8px;
 }
 
 .buttons {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
 }
 
-
 button {
-  padding: 10px 14px;
-  border-radius: 10px;
+  width: 100%;
+  max-width: 200px;
+  padding: 12px 20px;
+  border-radius: 12px;
   border: none;
-
   background: #1a172c;
   color: #fefefe;
-
+  font-size: 15px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
-  font-size: 14px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(26, 23, 44, 0.2);
 }
 
 button:hover {
-  opacity: 0.92;
-  transform: translateY(-1px);
-}
-
-.error.general {
-  margin-top: -4px;
+  background: #2d2a44;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(26, 23, 44, 0.3);
 }
 </style>

@@ -52,10 +52,17 @@ button {
   background: #0d0d0d;
 }
 
+.icon-emoji {
+  width: 36px;
+  height: 36px;
+  vertical-align: middle;
+  object-fit: contain;
+}
+
 #app {
-  max-width: 1280px;
+  max-width: 100%;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 0;
   text-align: center;
 }
 

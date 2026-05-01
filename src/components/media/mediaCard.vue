@@ -9,7 +9,12 @@ const props = defineProps({
 const emit = defineEmits(["delete"])
 
 const router = useRouter()
-const { updateStatus, statusLabels, increaseProgress } = useMedia()
+const { updateStatus, statusLabels, increaseProgress, updateMedia } = useMedia()
+
+function markFilmWatched() {
+    changeStatus('done')
+    router.push('/')  
+}
 
 // =========================
 // ОТКРЫТЬ СТРАНИЦУ
@@ -44,6 +49,17 @@ function isOverdue() {
   return watchDate < today
 }
 
+// уменьшение прогресса (только для сериалов) с возвратом в "хочу посмотреть" при 0
+function decProgress() {
+  if (props.item.type !== 'series') return
+  let newProgress = (props.item.progress || 0) - 1
+  if (newProgress < 0) newProgress = 0
+  updateMedia(props.item.id, { progress: newProgress })
+  if (newProgress === 0) {
+    updateStatus(props.item.id, 'want')
+  }
+}
+
 </script>
 
 <template>
@@ -68,18 +84,22 @@ function isOverdue() {
       <p class="status">{{ statusLabels[item.status] }}</p>
 
       <p v-if="item.watchDate">📅 {{ new Date(item.watchDate).toLocaleDateString() }}</p>
+      <!-- требуется поле с добавленной/измененной датой -->
+       <!-- ТИПО ТАКОГО -- <p v-if="item.dateAdded">➕ Добавлено: {{ new Date(item.dateAdded).toLocaleDateString() }}</p> -->
 
       <!-- ========================= -->
       <!-- ПРОГРЕСС -->
       <!-- ========================= -->
+       <!-- запасной вариант для продвижения серии -->
       <p v-if="item.type === 'series'">
-        Прогресс: {{ item.progress }} / {{ item.totalEpisodes }}
-        <!-- ДОБАВЛЕНО 2: кнопка прогресса -->
-        <button @click="incProgress" :disabled="item.progress >= item.totalEpisodes" class="progress-btn">+</button>
+        Прогресс: {{ item.progress || 0 }} / {{ item.totalEpisodes ? item.totalEpisodes : '?' }}
+        <!-- отключить +, если значение totalEpisodes отсутствует или достигнуто -->
+        <!-- кнопка прогресса -->
+        <button @click="decProgress" class="progress-btn">–</button>
+        <button @click="incProgress" :disabled="!item.totalEpisodes || item.progress >= item.totalEpisodes" class="progress-btn">+</button>
       </p>
-
       <p v-else>
-        ⏱  {{ item.duration }} мин
+        ⏱ {{ item.duration || '?' }} мин       
       </p>
 
       <!-- ========================= -->
@@ -105,7 +125,6 @@ function isOverdue() {
 .card {
   display: flex;
   gap: 14px;
-  padding: 16px;
   border-radius: 16px;
   border: 1px solid #e5e5e5;
   background: #fefefe;
@@ -125,8 +144,8 @@ function isOverdue() {
 }
 
 .cover {
-  width: 80px;
-  height: 110px;
+  width: 250px;
+  height: 350px;
   object-fit: cover;
   border-radius: 10px;
   flex-shrink: 0;
@@ -137,7 +156,9 @@ function isOverdue() {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  align-items: center;
+  text-align: center;
+  gap: 15px;
   min-width: 0;
 }
 
@@ -159,11 +180,11 @@ function isOverdue() {
 .status {
   display: inline-flex;
   width: fit-content;
-  padding: 4px 10px;
+  padding: 10px 25px;
   border-radius: 999px;
   background: #fdeabf;
   color: #1a172c;
-  font-weight: 600;
+  font-weight: 800;
 }
 
 .buttons {
@@ -174,11 +195,11 @@ function isOverdue() {
 }
 
 .buttons button {
+  margin-top: 10px;
   border-radius: 999px;
   cursor: pointer;
   transition: all 0.2s ease;
-  padding: 6px 12px;
-  border: 1px solid transparent;
+  padding: 10px 25px;
   font-size: 13px;
 }
 
@@ -215,7 +236,6 @@ function isOverdue() {
 }
 
 .progress-btn {
- 
   border: none;
   margin-left: 4px;
   padding: 2px 8px;

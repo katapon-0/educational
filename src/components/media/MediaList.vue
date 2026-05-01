@@ -14,7 +14,7 @@ const emit = defineEmits(["delete"])
 
 const { filterByType, filterByStatus, sortByDate, getOverdue, statuses, statusLabels } = useMedia()
 
-const filter = ref("all")
+// const filter = ref("all")
 const typeFilter = ref("all")
 const statusFilter = ref("all")
 const sortType = ref("date-asc")
@@ -22,18 +22,12 @@ const sortType = ref("date-asc")
 const filteredMedia = computed(function() {
   let list = props.items   // ← используем ПРОП, а не глобальный media
 
-  // старый фильтр по типу (фильмы/сериалы)
-  if (filter.value === "series") {
-    list = list.filter(function(m) { return m.type === "series" })
-  } else if (filter.value === "film") {
-    list = list.filter(function(m) { return m.type === "film" })
-  }
-
-  // новые фильтры
+  // фильтр типа
   list = filterByType(list, typeFilter.value)
+  // фильтр состояния
   list = filterByStatus(list, statusFilter.value)
 
-  // сортировка
+  // сортировка с просроченным приоритетом
   if (sortType.value === "date-asc") {
     list = sortByDate(list, "asc")
   } else if (sortType.value === "date-desc") {
@@ -60,26 +54,22 @@ const filteredMedia = computed(function() {
 <template>
   <div class="list">
     <div class="filters">
-      <button @click="filter = 'all'" :class="{ active: filter === 'all' }">Все</button>
-      <button @click="filter = 'series'" :class="{ active: filter === 'series' }">Сериалы</button>
-      <button @click="filter = 'film'" :class="{ active: filter === 'film' }">Фильмы</button>
-
+      <!-- переключен на TypeFilter для унифицированной фильтрации типов -->
+      <button @click="typeFilter = 'all'" :class="{ active: typeFilter === 'all' }">Все</button>
+      <button @click="typeFilter = 'series'" :class="{ active: typeFilter === 'series' }">Сериалы</button>
+      <button @click="typeFilter = 'film'" :class="{ active: typeFilter === 'film' }">Фильмы</button>
       <span class="separator"></span>
-
       <button @click="statusFilter = 'all'" :class="{ active: statusFilter === 'all' }">Все статусы</button>
       <button v-for="st in statuses" :key="st" @click="statusFilter = st" :class="{ active: statusFilter === st }">
         {{ statusLabels[st] }}
       </button>
-
       <span class="separator"></span>
-
       <select v-model="sortType" class="sort-select">
         <option value="date-asc">📅 Ближайшие</option>
         <option value="date-desc">📅 Поздние</option>
         <option value="overdue">⚠️ Просроченные</option>
       </select>
     </div>
-
     <div class="grid">
       <MediaCard
         v-for="item in filteredMedia"

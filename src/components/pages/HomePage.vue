@@ -1,50 +1,31 @@
 <script setup>
-import { computed } from "vue"
-import { useRouter } from "vue-router"
-import { useUsers } from "../../composables/useUsers"
-import { useMedia } from "../../composables/useMedia"
-import { ref } from "vue"
-import MediaList from "../Media/MediaList.vue"
-import AddItemModal from "../Media/AddItemModal.vue"
+import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
+import { useUsers } from "../../composables/useUsers";
+import { useMedia } from "../../composables/useMedia";
+import MediaList from "../Media/MediaList.vue";
 
-const router = useRouter()
-const { currentUser, logout, userMedia, deleteMediaFromUser } = useUsers()
-const { getStats, getSuggestion } = useMedia()
+import iconWant from "../../assets/icons/want.png";
+import iconWatching from "../../assets/icons/watching.png";
+import iconDone from "../../assets/icons/done.png";
+import iconAbandoned from "../../assets/icons/abandoned.png";
+import iconTotal from "../../assets/icons/total.png";
 
-const userName = computed(function() {
-  return currentUser.value?.name || currentUser.value?.login
-})
+const router = useRouter();
+const { currentUser, userMedia, deleteMediaFromUser } = useUsers();
+const { getStats, getSuggestion } = useMedia();
 
-const stats = computed(function() {
-  return getStats(userMedia.value)
-})
-
-const suggestion = ref(null)
-const addModalVisible = ref(false)
+const stats = computed(() => getStats(userMedia.value));
+const suggestion = ref(null);
+const hasSuggestionRequested = ref(false);
 
 function refreshSuggestion() {
-  suggestion.value = getSuggestion(userMedia.value)
+  suggestion.value = getSuggestion(userMedia.value);
+  hasSuggestionRequested.value = true;
 }
 
-function goLogin() {
-  router.push({ name: "login" })
-}
-
-function handleLogout() {
-  logout()
-}
-
-function openAddModal() {
-  addModalVisible.value = true
-}
-
-function closeAddModal() {
-  addModalVisible.value = false
-}
-
-// функция удаления
 function handleDelete(id) {
-  deleteMediaFromUser(id)
+  deleteMediaFromUser(id);
 }
 </script>
 
@@ -53,82 +34,100 @@ function handleDelete(id) {
     <div v-if="!currentUser">
       <h2>Вы не авторизованы</h2>
       <p>Пожалуйста, войдите в систему</p>
-      <button @click="goLogin" class="btn-primary">Перейти к входу</button>
+      <button @click="router.push({ name: 'login' })" class="btn-primary">
+        Перейти к входу
+      </button>
     </div>
 
-    <div v-else>
-      <header class="header">
-        <h1>🎬 WatchList</h1>
-        <div class="user-info">
-          <span class="username">👤 {{ userName }}</span>
-          <button @click="handleLogout" class="btn-logout">Выйти</button>
-          <button @click="openAddModal" class="btn-add">+ Добавить</button>
-        </div>
-      </header>
 
+
+    <div v-else>
+      <!-- Статистика -->
       <div class="stats">
-        <div class="stat-card">⏳ Хочу: {{ stats.want }}</div>
-        <div class="stat-card">▶️ Смотрю: {{ stats.watching }}</div>
-        <div class="stat-card">✅ Посмотрено: {{ stats.done }}</div>
-        <div class="stat-card">❌ Заброшено: {{ stats.abandoned }}</div>
+        <div class="stat-card">
+          <img :src="iconWant" class="icon-emoji" alt="want" /> Хочу:
+          {{ stats.want }}
+        </div>
+
+        <div class="stat-card">
+          <img :src="iconWatching" class="icon-emoji" alt="watching" /> Смотрю:
+          {{ stats.watching }}
+        </div>
+
+        <div class="stat-card">
+          <img :src="iconDone" class="icon-emoji" alt="watching" /> Посмотрено: 
+          {{ stats.done }}
+        </div>
+
+        <div class="stat-card">
+          <img :src="iconAbandoned" class="icon-emoji" alt="watching" /> Заброшено: 
+          {{ stats.abandoned }}
+        </div>
+
+        <div class="stat-card">
+          <img :src="iconTotal" class="icon-emoji" alt="watching" /> Всего: 
+          {{ stats.total }}
+        </div>
+
       </div>
 
+      <!-- Рекомендация -->
       <div class="suggestion">
-        <button @click="refreshSuggestion" class="btn-suggestion">🎯 Что посмотреть ?</button>
+        <img
+          src="../../assets/icons/suggetion.png"
+          class="suggestion-icon"
+          alt="icon"
+        />
+        <button @click="refreshSuggestion" class="btn-suggestion">
+          Что посмотреть ?
+        </button>
+
+        <!-- Карточка рекомендации (справа от кнопки) -->
         <div v-if="suggestion" class="suggestion-card">
-          <strong>{{ suggestion.title }}</strong> ({{ suggestion.type === "series" ? "Сериал" : "Фильм" }})
-          <span v-if="suggestion.watchDate"> — 📅 {{ new Date(suggestion.watchDate).toLocaleDateString() }}</span>
-          <button @click="router.push('/media/' + suggestion.id)" class="btn-link">Перейти</button>
+          <img :src="suggestion.image" class="suggestion-poster" />
+          <div class="suggestion-info">
+            <strong>{{ suggestion.title }}</strong>
+            <span
+              >({{ suggestion.type === "series" ? "Сериал" : "Фильм" }})</span
+            >
+            <span v-if="suggestion.watchDate">
+              📅 {{ new Date(suggestion.watchDate).toLocaleDateString() }}
+            </span>
+            <button
+              @click="router.push('/media/' + suggestion.id)"
+              class="btn-link"
+            >
+              Перейти
+            </button>
+          </div>
         </div>
+
+        <!-- Сообщение об отсутствии вариантов -->
+        <p
+          v-else-if="hasSuggestionRequested && !suggestion"
+          class="empty-suggestion"
+        >
+          Нет доступных вариантов
+        </p>
       </div>
 
       <hr class="divider" />
-
       <div v-if="!userMedia.length" class="empty-state">
         <p>У вас пока нет медиа 🎬</p>
-        <p>Нажмите «+ Добавить», чтобы начать</p>
+        <p>Нажмите «+ Добавить» в шапке, чтобы начать</p>
       </div>
-
-      <!-- ПЕРЕДАЁМ СПИСОК И ОБРАБОТЧИК УДАЛЕНИЯ -->
-      <MediaList :items="userMedia" @delete="handleDelete" v-else />
-
-      <AddItemModal v-if="addModalVisible" @close="closeAddModal" />
+      <MediaList v-else :items="userMedia" @delete="handleDelete" />
     </div>
   </div>
 </template>
 
 <style scoped>
-  .home {
+.home {
   padding: 20px;
   color: #1a172c;
   font-family: Arial, sans-serif;
   min-height: 100vh;
   background: #fefefe;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-bottom: 20px;
-  padding: 16px 18px;
-  background: #1a172c;
-  border-radius: 18px;
-  border: 1px solid #1a172c;
-}
-
-.header h1 {
-  margin: 0;
-  color: #fefefe;
-}
-
-.user-info {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
 }
 
 .username {
@@ -161,11 +160,6 @@ function handleDelete(id) {
   transition: all 0.2s;
 }
 
-.btn-add:hover {
-  background: #fdeabf;
-  transform: translateY(-1px);
-}
-
 .stats {
   display: flex;
   gap: 16px;
@@ -182,52 +176,89 @@ function handleDelete(id) {
 }
 
 .suggestion {
-  background: #ffffff;
+  background: linear-gradient(135deg, #fdeabf 0%, #fdb688 100%);
+  border-radius: 20px;
   padding: 16px;
-  border-radius: 12px;
   margin-bottom: 20px;
-  border: 1px solid #e5e5e5;
+  box-shadow: 0 6px 20px rgba(26, 23, 44, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding-left: 40px;
+}
+
+.suggestion-icon {
+  width: 150px;
+  height: 150px;
+  border-radius: 16px;
+  object-fit: cover;
 }
 
 .btn-suggestion {
-  background: #fdb688;
-  color: #1a172c;
+  background: #1a172c;
+  color: #fefefe;
   border: none;
-  border-radius: 8px;
-  padding: 8px 14px;
+  border-radius: 12px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
-  font-size: 15px;
   transition: all 0.2s;
 }
 
 .btn-suggestion:hover {
   opacity: 0.92;
+  transform: translateY(-2px);
 }
 
 .suggestion-card {
-  margin-top: 12px;
   display: flex;
-  gap: 12px;
   align-items: center;
-  flex-wrap: wrap;
-  padding: 12px;
-  background: #fdeabf;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(4px);
+  border-radius: 16px;
+  padding: 16px;
+  margin-top: 0px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  flex: 1;
+  min-width: 0;
+  margin-right: 100px;
+  margin-left: 40px;
+}
+
+.suggestion-poster {
+  width: 80px;
+  height: 110px;
+  object-fit: cover;
   border-radius: 10px;
+  background: #fdeabf;
+}
+
+.suggestion-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+  color: #1a172c;
 }
 
 .btn-link {
-  color: #1a172c;
-  border: 1px solid #ddd;
-  padding: 6px 12px;
-  cursor: pointer;
-  background: transparent;
+  background: #1a172c;
+  color: #fefefe;
+  border: none;
   border-radius: 8px;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-size: 13px;
   transition: all 0.2s;
+  align-self: flex-start;
 }
 
 .btn-link:hover {
-  background: #fdeabf;
-  border-color: #fdb688;
+  opacity: 0.9;
+  transform: scale(1.02);
 }
 
 .divider {
@@ -254,5 +285,10 @@ function handleDelete(id) {
 
 .btn-primary:hover {
   opacity: 0.92;
+}
+
+.empty-suggestion {
+  margin-top: 10px;
+  color: #b24a4a;
 }
 </style>

@@ -6,7 +6,7 @@ import { useMedia } from "../../composables/useMedia"
 const route = useRoute()
 const router = useRouter()
 
-const { getMediaById, updateMedia, deleteMedia } = useMedia()
+const { getMediaById, updateMedia, deleteMedia, increaseProgress, updateStatus } = useMedia()
 
 // =========================
 // ДАННЫЕ
@@ -28,7 +28,8 @@ const form = ref({
     type: "",
     progress: 0,
     totalEpisodes: 0,
-    episodeDuration: 0
+    episodeDuration: 0,
+    image: ""
 })
 
 // =========================
@@ -41,9 +42,10 @@ watch(item, (val) => {
     form.value = {
         title: val.title,
         type: val.type,
-        progress: val.progress,
-        totalEpisodes: val.totalEpisodes,
-        episodeDuration: val.episodeDuration
+        progress: val.progress || 0,
+        totalEpisodes: val.totalEpisodes || 0,
+        episodeDuration: val.episodeDuration || 0,
+        image: val.image || ""
     }
 }, { immediate: true })
 
@@ -71,7 +73,8 @@ function save() {
         type: form.value.type,
         progress: form.value.progress,
         totalEpisodes: form.value.totalEpisodes,
-        episodeDuration: form.value.episodeDuration
+        episodeDuration: form.value.episodeDuration,
+        image: form.value.image
     })
 
     isEditing.value = false
@@ -81,12 +84,28 @@ function save() {
 // ПРОГРЕСС
 // =========================
 
-function increaseProgress() {
+function handleIncreaseProgress() {
     if (!item.value) return
+    if (item.value.type !== 'series') return
+    //  используем increaseProgress из composable (он теперь управляет статусами)
+    increaseProgress(item.value.id)
+    // переход на главную только при полном завершении
+    const updatedItem = getMediaById(item.value.id)
+    if (updatedItem && updatedItem.progress >= updatedItem.totalEpisodes) {
+        router.push('/')
+    }
+}
 
-    updateMedia(item.value.id, {
-        progress: (item.value.progress || 0) + 1
-    })
+// уменьшение прогресса (как в MediaCard)
+function handleDecreaseProgress() {
+    if (!item.value) return
+    if (item.value.type !== 'series') return
+    let newProgress = (item.value.progress || 0) - 1
+    if (newProgress < 0) newProgress = 0
+    updateMedia(item.value.id, { progress: newProgress })
+    if (newProgress === 0) {
+        updateStatus(item.value.id, 'want')
+    }
 }
 
 // =========================
@@ -101,11 +120,17 @@ function remove() {
 }
 
 // =========================
-// BACK
+// НАЗАД
 // =========================
 
 function goBack() {
     router.back()
+}
+
+function markAsWatched() {
+    if (!item.value) return
+    updateMedia(item.value.id, { status: 'done' })
+    router.push('/')
 }
 </script>
 
@@ -114,39 +139,39 @@ function goBack() {
 
     <button class="btn-back" @click="goBack">← назад</button>
 
-    <!-- VIEW -->
+    <!-- РЕЖИМ ПРОСМОТРА -->
     <div v-if="!isEditing" class="card">
 
       <h1>{{ item.title }}</h1>
+      <div class="media-row">
+        <img v-if="item.image" :src="item.image" class="detail-image" />
+        <div class="description-box">
+          <p v-if="item.description" class="description">{{ item.description }}</p>
+          <p v-else class="description placeholder">Описание отсутствует</p>
+        </div>
+      </div>
 
-      <p class="meta">Тип: {{ item.type }}</p>
+      <div class="center-meta">
+        <p class="meta">{{ item.type === 'series' ? 'Сериал' : 'Фильм' }} </p>
+        <p v-if="item.type === 'series'" class="meta">
+      {{ item.progress || 0 }} / {{ item.totalEpisodes ? item.totalEpisodes : '?' }}
+        </p>
+        <p v-else class="meta">{{ item.episodeDuration || item.duration || '?' }} мин</p>
+      </div>
 
-      <p v-if="item.type === 'series'" class="meta">
-        {{ item.progress }} / {{ item.totalEpisodes }}
-      </p>
-
-      <p v-else class="meta">
-        {{ item.episodeDuration }} мин
-      </p>
-
-      <div class="buttons">
-        <button class="btn-accent" @click="increaseProgress">
-          + прогресс
-        </button>
-
-        <button class="btn-dark" @click="startEdit">
-          редактировать
-        </button>
-
-        <button class="btn-danger" @click="remove">
-          удалить
-        </button>
+      <div class="buttons center-buttons">
+        <!-- кнопка минус для сериалов -->
+        <button v-if="item.type === 'series'" class="btn-accent" @click="handleDecreaseProgress">–</button>
+        <button v-if="item.type === 'series'" class="btn-accent" @click="handleIncreaseProgress">+</button>
+        <button v-else class="btn-accent" @click="markAsWatched">✔ Просмотрено</button>
+        <button class="btn-dark" @click="startEdit">редактировать</button>
+        <button class="btn-danger" @click="remove">удалить</button>
       </div>
 
     </div>
 
-    <!-- EDIT -->
-    <div v-else class="card">
+    <!-- РЕЖИМ РЕДАКТИРОВАНИЯ -->
+    <div v-else class="card  edit-card">
 
       <h2>Редактирование</h2>
 
@@ -157,13 +182,16 @@ function goBack() {
         <option value="film">Фильм</option>
       </select>
 
+      <!-- поле URL изображения -->
+      <input v-model="form.image" placeholder="URL изображения" />
+
       <div v-if="form.type === 'series'">
-        <input v-model="form.progress" type="number" placeholder="Прогресс" />
-        <input v-model="form.totalEpisodes" type="number" placeholder="Эпизоды" />
+        <input v-model.number="form.progress" type="number" placeholder="Прогресс" :max="form.totalEpisodes" />
+        <input v-model.number="form.totalEpisodes" type="number" placeholder="Всего эпизодов" />
       </div>
 
       <div v-else>
-        <input v-model="form.episodeDuration" type="number" placeholder="Длительность" />
+        <input v-model.number="form.episodeDuration" type="number" placeholder="Длительность (мин)" />
       </div>
 
       <div class="buttons">
@@ -223,6 +251,7 @@ function goBack() {
 
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 10px;
 
   transition: all 0.2s;
@@ -236,6 +265,40 @@ function goBack() {
 .card h2 {
   margin: 0;
   color: #1a172c;
+}
+
+.media-row {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.detail-image {
+  width: 200px;         
+  height: auto;
+  max-height: 300px;
+  object-fit: cover;
+  border-radius: 10px;
+  flex-shrink: 0;
+  border-radius: 10px;
+}
+
+.description-box {
+  flex: 1;
+  text-align: left;
+}
+
+.description {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #1a172c;
+}
+
+.placeholder {
+  opacity: 0.5;
+  font-style: italic;
 }
 
 .meta {
@@ -326,5 +389,24 @@ select:focus {
   text-align: center;
   padding: 60px;
   opacity: 0.5;
+}
+
+.edit-card input,
+.edit-card select {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  background: #fefefe;
+  color: #1a172c;
+  transition: all 0.2s;
+}
+
+.edit-card input:focus,
+.edit-card select:focus {
+  outline: none;
+  border-color: #fdb688;
 }
 </style>
