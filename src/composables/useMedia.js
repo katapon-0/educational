@@ -81,10 +81,10 @@ function getMediaByType(type) {
 // =========================
 var statuses = ["want", "watching", "done", "abandoned"]
 var statusLabels = {
-    want: "⏳ Хочу посмотреть",
-    watching: "▶️ Смотрю",
-    done: "✅ Посмотрено",
-    abandoned: "❌ Заброшено"
+    want: "Хочу посмотреть",
+    watching: "Смотрю",
+    done: "Посмотрено",
+    abandoned: "Заброшено"
 }
 
 function updateStatus(id, newStatus) {

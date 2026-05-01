@@ -125,7 +125,6 @@ function decProgress() {
 .card {
   display: flex;
   gap: 14px;
-  padding: 16px;
   border-radius: 16px;
   border: 1px solid #e5e5e5;
   background: #fefefe;
@@ -145,8 +144,8 @@ function decProgress() {
 }
 
 .cover {
-  width: 80px;
-  height: 110px;
+  width: 250px;
+  height: 350px;
   object-fit: cover;
   border-radius: 10px;
   flex-shrink: 0;
@@ -157,7 +156,9 @@ function decProgress() {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  align-items: center;
+  text-align: center;
+  gap: 15px;
   min-width: 0;
 }
 
@@ -179,11 +180,11 @@ function decProgress() {
 .status {
   display: inline-flex;
   width: fit-content;
-  padding: 4px 10px;
+  padding: 10px 25px;
   border-radius: 999px;
   background: #fdeabf;
   color: #1a172c;
-  font-weight: 600;
+  font-weight: 800;
 }
 
 .buttons {
@@ -194,11 +195,11 @@ function decProgress() {
 }
 
 .buttons button {
+  margin-top: 10px;
   border-radius: 999px;
   cursor: pointer;
   transition: all 0.2s ease;
-  padding: 6px 12px;
-  border: 1px solid transparent;
+  padding: 10px 25px;
   font-size: 13px;
 }
 

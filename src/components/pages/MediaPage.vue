@@ -143,15 +143,23 @@ function markAsWatched() {
     <div v-if="!isEditing" class="card">
 
       <h1>{{ item.title }}</h1>
-      <img v-if="item.image" :src="item.image" class="detail-image" />
-      <p v-if="item.description" class="description">{{ item.description }}</p>
-      <p class="meta">{{ item.type === 'series' ? 'Сериал' : 'Фильм' }}</p>
+      <div class="media-row">
+        <img v-if="item.image" :src="item.image" class="detail-image" />
+        <div class="description-box">
+          <p v-if="item.description" class="description">{{ item.description }}</p>
+          <p v-else class="description placeholder">Описание отсутствует</p>
+        </div>
+      </div>
 
-      <p v-if="item.type === 'series'" class="meta">
-        {{ item.progress || 0 }} / {{ item.totalEpisodes ? item.totalEpisodes : '?' }}
-      </p>
-      <p v-else class="meta">{{ item.episodeDuration || item.duration || '?' }} мин</p>
-      <div class="buttons">
+      <div class="center-meta">
+        <p class="meta">{{ item.type === 'series' ? 'Сериал' : 'Фильм' }} </p>
+        <p v-if="item.type === 'series'" class="meta">
+      {{ item.progress || 0 }} / {{ item.totalEpisodes ? item.totalEpisodes : '?' }}
+        </p>
+        <p v-else class="meta">{{ item.episodeDuration || item.duration || '?' }} мин</p>
+      </div>
+
+      <div class="buttons center-buttons">
         <!-- кнопка минус для сериалов -->
         <button v-if="item.type === 'series'" class="btn-accent" @click="handleDecreaseProgress">–</button>
         <button v-if="item.type === 'series'" class="btn-accent" @click="handleIncreaseProgress">+</button>
@@ -243,6 +251,7 @@ function markAsWatched() {
 
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 10px;
 
   transition: all 0.2s;
@@ -258,9 +267,38 @@ function markAsWatched() {
   color: #1a172c;
 }
 
+.media-row {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
 .detail-image {
-  max-width: 100%;
+  width: 200px;         
+  height: auto;
+  max-height: 300px;
+  object-fit: cover;
   border-radius: 10px;
+  flex-shrink: 0;
+  border-radius: 10px;
+}
+
+.description-box {
+  flex: 1;
+  text-align: left;
+}
+
+.description {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #1a172c;
+}
+
+.placeholder {
+  opacity: 0.5;
+  font-style: italic;
 }
 
 .meta {
