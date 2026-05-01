@@ -4,24 +4,13 @@ import { useRouter } from "vue-router"
 import { useUsers } from "../../composables/useUsers"
 import { useMedia } from "../../composables/useMedia"
 import MediaList from "../Media/MediaList.vue"
-import AddItemModal from "../Media/AddItemModal.vue"
 
 const router = useRouter()
-const { currentUser, logout, userMedia, deleteMediaFromUser } = useUsers()
+const { currentUser, userMedia, deleteMediaFromUser } = useUsers()
 const { getStats, getSuggestion } = useMedia()
 
-const userName = computed(function() {
-  return currentUser.value?.name || currentUser.value?.login
-})
-
-const stats = computed(function() {
-  return getStats(userMedia.value)
-})
-
+const stats = computed(() => getStats(userMedia.value))
 const suggestion = ref(null)
-const addModalVisible = ref(false)
-
-// пустой флаг сообщения с предложением
 const hasSuggestionRequested = ref(false)
 
 function refreshSuggestion() {
@@ -29,23 +18,6 @@ function refreshSuggestion() {
   hasSuggestionRequested.value = true
 }
 
-function goLogin() {
-  router.push({ name: "login" })
-}
-
-function handleLogout() {
-  logout()
-}
-
-function openAddModal() {
-  addModalVisible.value = true
-}
-
-function closeAddModal() {
-  addModalVisible.value = false
-}
-
-// функция удаления
 function handleDelete(id) {
   deleteMediaFromUser(id)
 }
@@ -56,20 +28,11 @@ function handleDelete(id) {
     <div v-if="!currentUser">
       <h2>Вы не авторизованы</h2>
       <p>Пожалуйста, войдите в систему</p>
-      <button @click="goLogin" class="btn-primary">Перейти к входу</button>
+      <button @click="router.push({ name: 'login' })" class="btn-primary">Перейти к входу</button>
     </div>
-
     <div v-else>
-      <header class="header">
-        <h1>🎬 WatchList</h1>
-        <div class="user-info">
-          <span class="username">👤 {{ userName }}</span>
-          <button @click="handleLogout" class="btn-logout">Выйти</button>
-          <button @click="openAddModal" class="btn-add">+ Добавить</button>
-        </div>
-      </header>
-
-      <!-- мини-статистики-->
+      <!-- FEATURE: header removed, now in MenuTop.vue -->
+      <!-- Статистика -->
       <div class="stats">
         <div class="stat-card">⏳ Хочу: {{ stats.want }}</div>
         <div class="stat-card">▶️ Смотрю: {{ stats.watching }}</div>
@@ -78,28 +41,23 @@ function handleDelete(id) {
         <div class="stat-card">📊 Всего: {{ stats.total }}</div>
       </div>
 
+      <!-- Рекомендация -->
       <div class="suggestion">
         <button @click="refreshSuggestion" class="btn-suggestion">🎯 Что посмотреть ?</button>
         <div v-if="suggestion" class="suggestion-card">
-          <strong>{{ suggestion.title }}</strong> ({{ suggestion.type === "series" ? "Сериал" : "Фильм" }})
-          <span v-if="suggestion.watchDate"> — 📅 {{ new Date(suggestion.watchDate).toLocaleDateString() }}</span>
+          <strong>{{ suggestion.title }}</strong> ({{ suggestion.type === 'series' ? 'Сериал' : 'Фильм' }})
+          <span v-if="suggestion.watchDate"> --- 📅 {{ new Date(suggestion.watchDate).toLocaleDateString() }}</span>
           <button @click="router.push('/media/' + suggestion.id)" class="btn-link">Перейти</button>
         </div>
-        <!-- пустое сообщение с предложением -->
-         <p v-if="hasSuggestionRequested && !suggestion" class="empty-suggestion">Нет доступных вариантов</p>
+        <p v-if="hasSuggestionRequested && !suggestion" class="empty-suggestion">Нет доступных вариантов</p>
       </div>
 
       <hr class="divider" />
-
       <div v-if="!userMedia.length" class="empty-state">
         <p>У вас пока нет медиа 🎬</p>
-        <p>Нажмите «+ Добавить», чтобы начать</p>
+        <p>Нажмите «+ Добавить» в шапке, чтобы начать</p>
       </div>
-
-      <!-- ПЕРЕДАЁМ СПИСОК И ОБРАБОТЧИК УДАЛЕНИЯ -->
-      <MediaList :items="userMedia" @delete="handleDelete" v-else />
-
-      <AddItemModal v-if="addModalVisible" @close="closeAddModal" />
+      <MediaList v-else :items="userMedia" @delete="handleDelete" />
     </div>
   </div>
 </template>
@@ -113,30 +71,6 @@ function handleDelete(id) {
   background: #fefefe;
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-bottom: 20px;
-  padding: 16px 18px;
-  background: #1a172c;
-  border-radius: 18px;
-  border: 1px solid #1a172c;
-}
-
-.header h1 {
-  margin: 0;
-  color: #fefefe;
-}
-
-.user-info {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
-}
 
 .username {
   color: #fefefe;
@@ -166,11 +100,6 @@ function handleDelete(id) {
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
-}
-
-.btn-add:hover {
-  background: #fdeabf;
-  transform: translateY(-1px);
 }
 
 .stats {

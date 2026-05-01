@@ -18,7 +18,8 @@ const manualForm = ref({
   watchDate: "",
   link: "",
   duration: null,
-  totalEpisodes: null
+  totalEpisodes: null,
+  image: ""
 })
 
 // =========================
@@ -36,7 +37,8 @@ function addSelected() {
     type: selected.type,
     description: selected.description || "",
     watchDate: selected.watchDate || null,
-    link: selected.link || null
+    link: selected.link || null,
+    image: selected.image || ""
   }
 
   // добавляем специфичные поля
@@ -61,7 +63,8 @@ function addManual() {
     type: manualForm.value.type,
     watchDate: manualForm.value.watchDate || null,
     link: manualForm.value.link || null,
-    description: ""
+    description: "",
+    image: manualForm.value.image || ""
   }
 
   if (manualForm.value.type === "series") {
@@ -113,6 +116,7 @@ function addManual() {
           </select>
           <input type="date" v-model="manualForm.watchDate" placeholder="Дата просмотра" />
           <input v-model="manualForm.link" placeholder="Ссылка" />
+          <input v-model="manualForm.image" placeholder="URL изображения" />
 
           <div v-if="manualForm.type === 'film'">
             <input type="number" v-model="manualForm.duration" placeholder="Длительность (мин)" />

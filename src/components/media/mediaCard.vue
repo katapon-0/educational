@@ -77,11 +77,16 @@ function isOverdue() {
        <!-- запасной вариант для продвижения серии -->
       <p v-if="item.type === 'series'">
         Прогресс: {{ item.progress || 0 }} / {{ item.totalEpisodes ? item.totalEpisodes : '?' }}
+        <!-- отключить +, если значение totalEpisodes отсутствует или достигнуто -->
         <!-- кнопка прогресса -->
-        <button @click="incProgress" :disabled="item.progress >= item.totalEpisodes" class="progress-btn">+</button>
+        <button
+          @click="incProgress"
+          :disabled="!item.totalEpisodes || item.progress >= item.totalEpisodes"
+          class="progress-btn"
+        >+</button>
       </p>
       <p v-else>
-        ⏱  {{ item.duration }} мин
+        ⏱ {{ item.duration }} мин
       </p>
 
       <!-- ========================= -->

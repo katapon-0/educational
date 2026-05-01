@@ -87,7 +87,7 @@ const defaultMedia = [
         status: "want",
         watchDate: null,
         link: null,
-        duration: null,
+        duration: 120,
         progress: 0,
         image: img
     },

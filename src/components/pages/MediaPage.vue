@@ -28,7 +28,8 @@ const form = ref({
     type: "",
     progress: 0,
     totalEpisodes: 0,
-    episodeDuration: 0
+    episodeDuration: 0,
+    image: ""
 })
 
 // =========================
@@ -41,9 +42,10 @@ watch(item, (val) => {
     form.value = {
         title: val.title,
         type: val.type,
-        progress: val.progress,
-        totalEpisodes: val.totalEpisodes,
-        episodeDuration: val.episodeDuration
+        progress: val.progress || 0,
+        totalEpisodes: val.totalEpisodes || 0,
+        episodeDuration: val.episodeDuration || 0,
+        image: val.image || ""
     }
 }, { immediate: true })
 
@@ -71,7 +73,8 @@ function save() {
         type: form.value.type,
         progress: form.value.progress,
         totalEpisodes: form.value.totalEpisodes,
-        episodeDuration: form.value.episodeDuration
+        episodeDuration: form.value.episodeDuration,
+        image: form.value.image
     })
 
     isEditing.value = false
@@ -107,6 +110,11 @@ function remove() {
 function goBack() {
     router.back()
 }
+
+function markAsWatched() {
+  if (!item.value) return
+  updateMedia(item.value.id, { status: 'done' })
+}
 </script>
 
 <template>
@@ -114,39 +122,28 @@ function goBack() {
 
     <button class="btn-back" @click="goBack">← назад</button>
 
-    <!-- VIEW -->
+    <!-- РЕЖИМ ПРОСМОТРА -->
     <div v-if="!isEditing" class="card">
 
       <h1>{{ item.title }}</h1>
-
+      <img v-if="item.image" :src="item.image" class="detail-image" />
       <p class="meta">Тип: {{ item.type }}</p>
 
       <p v-if="item.type === 'series'" class="meta">
         {{ item.progress || 0 }} / {{ item.totalEpisodes ? item.totalEpisodes : '?' }}
       </p>
-
-      <p v-else class="meta">
-        {{ item.episodeDuration }} мин
-      </p>
-
+      <p v-else class="meta">{{ item.episodeDuration }} мин</p>
       <div class="buttons">
-        <button class="btn-accent" @click="increaseProgress">
-          + прогресс
-        </button>
-
-        <button class="btn-dark" @click="startEdit">
-          редактировать
-        </button>
-
-        <button class="btn-danger" @click="remove">
-          удалить
-        </button>
+        <button v-if="item.type === 'series'" class="btn-accent" @click="increaseProgress">+ прогресс</button>
+        <button v-else class="btn-accent" @click="markAsWatched">✔ Просмотрено</button>
+        <button class="btn-dark" @click="startEdit">редактировать</button>
+        <button class="btn-danger" @click="remove">удалить</button>
       </div>
 
     </div>
 
-    <!-- EDIT -->
-    <div v-else class="card">
+    <!-- РЕЖИМ РЕДАКТИРОВАНИЯ -->
+    <div v-else class="card  edit-card">
 
       <h2>Редактирование</h2>
 
@@ -157,13 +154,16 @@ function goBack() {
         <option value="film">Фильм</option>
       </select>
 
+      <!-- поле URL изображения -->
+      <input v-model="form.image" placeholder="URL изображения" />
+
       <div v-if="form.type === 'series'">
-        <input v-model="form.progress" type="number" placeholder="Прогресс" />
-        <input v-model="form.totalEpisodes" type="number" placeholder="Эпизоды" />
+        <input v-model.number="form.progress" type="number" placeholder="Прогресс" />
+        <input v-model.number="form.totalEpisodes" type="number" placeholder="Всего эпизодов" />
       </div>
 
       <div v-else>
-        <input v-model="form.episodeDuration" type="number" placeholder="Длительность" />
+        <input v-model.number="form.episodeDuration" type="number" placeholder="Длительность (мин)" />
       </div>
 
       <div class="buttons">
@@ -236,6 +236,11 @@ function goBack() {
 .card h2 {
   margin: 0;
   color: #1a172c;
+}
+
+.detail-image {
+  max-width: 100%;
+  border-radius: 10px;
 }
 
 .meta {
@@ -326,5 +331,24 @@ select:focus {
   text-align: center;
   padding: 60px;
   opacity: 0.5;
+}
+
+.edit-card input,
+.edit-card select {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+  background: #fefefe;
+  color: #1a172c;
+  transition: all 0.2s;
+}
+
+.edit-card input:focus,
+.edit-card select:focus {
+  outline: none;
+  border-color: #fdb688;
 }
 </style>
