@@ -1,9 +1,8 @@
 <script setup>
-import { computed } from "vue"
+import { computed, ref } from "vue"
 import { useRouter } from "vue-router"
 import { useUsers } from "../../composables/useUsers"
 import { useMedia } from "../../composables/useMedia"
-import { ref } from "vue"
 import MediaList from "../Media/MediaList.vue"
 import AddItemModal from "../Media/AddItemModal.vue"
 
@@ -22,8 +21,12 @@ const stats = computed(function() {
 const suggestion = ref(null)
 const addModalVisible = ref(false)
 
+// пустой флаг сообщения с предложением
+const hasSuggestionRequested = ref(false)
+
 function refreshSuggestion() {
   suggestion.value = getSuggestion(userMedia.value)
+  hasSuggestionRequested.value = true
 }
 
 function goLogin() {
@@ -66,11 +69,13 @@ function handleDelete(id) {
         </div>
       </header>
 
+      <!-- мини-статистики-->
       <div class="stats">
         <div class="stat-card">⏳ Хочу: {{ stats.want }}</div>
         <div class="stat-card">▶️ Смотрю: {{ stats.watching }}</div>
         <div class="stat-card">✅ Посмотрено: {{ stats.done }}</div>
         <div class="stat-card">❌ Заброшено: {{ stats.abandoned }}</div>
+        <div class="stat-card">📊 Всего: {{ stats.total }}</div>
       </div>
 
       <div class="suggestion">
@@ -80,6 +85,8 @@ function handleDelete(id) {
           <span v-if="suggestion.watchDate"> — 📅 {{ new Date(suggestion.watchDate).toLocaleDateString() }}</span>
           <button @click="router.push('/media/' + suggestion.id)" class="btn-link">Перейти</button>
         </div>
+        <!-- пустое сообщение с предложением -->
+         <p v-if="hasSuggestionRequested && !suggestion" class="empty-suggestion">Нет доступных вариантов</p>
       </div>
 
       <hr class="divider" />
@@ -254,5 +261,10 @@ function handleDelete(id) {
 
 .btn-primary:hover {
   opacity: 0.92;
+}
+
+.empty-suggestion {
+  margin-top: 10px;
+  color: #b24a4a;
 }
 </style>

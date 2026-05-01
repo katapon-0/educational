@@ -212,47 +212,39 @@ function getStats(mediaList) {
 }
 
 // =========================
-// "ЧТО ПОСМОТРЕТЬ СЕГОДНЯ"
+// "ЧТО ПОСМОТРЕТЬ СЕГОДНЯ" (МОДИФИЦИРОВАНО: случайный выбор)
 // =========================
 
 function getSuggestion(mediaList) {
+  // изменено на случайное предложение с просроченным приоритетом
+  var candidates = []
+  var overdueCandidates = []
   var today = new Date()
   today.setHours(0, 0, 0, 0)
 
-  var overdue = []
-  var upcoming = []
-
   for (var i = 0; i < mediaList.length; i++) {
     var item = mediaList[i]
-    if (item.status === "done") continue
-    if (!item.watchDate) continue
-
-    var watchDate = new Date(item.watchDate)
-    if (watchDate < today) {
-      overdue.push(item)
-    } else if (watchDate >= today) {
-      upcoming.push(item)
+    if (item.status !== 'want' && item.status !== 'watching') continue
+    if (item.watchDate) {
+      var watchDate = new Date(item.watchDate)
+      if (watchDate < today) {
+        overdueCandidates.push(item)
+      } else {
+        candidates.push(item)
+      }
+    } else {
+      candidates.push(item)
     }
   }
 
-  if (overdue.length > 0) {
-    return overdue[0]
+  if (overdueCandidates.length > 0) {
+    var randomIndex = Math.floor(Math.random() * overdueCandidates.length)
+    return overdueCandidates[randomIndex]
   }
-
-  if (upcoming.length > 0) {
-    upcoming.sort(function(a, b) {
-      return new Date(a.watchDate) - new Date(b.watchDate)
-    })
-    return upcoming[0]
+  if (candidates.length > 0) {
+    var randomIndex = Math.floor(Math.random() * candidates.length)
+    return candidates[randomIndex]
   }
-
-  for (var j = 0; j < mediaList.length; j++) {
-    var anyItem = mediaList[j]
-    if (anyItem.status === "want" || anyItem.status === "watching") {
-      return anyItem
-    }
-  }
-
   return null
 }
 

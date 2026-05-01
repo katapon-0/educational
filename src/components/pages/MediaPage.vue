@@ -122,7 +122,7 @@ function goBack() {
       <p class="meta">Тип: {{ item.type }}</p>
 
       <p v-if="item.type === 'series'" class="meta">
-        {{ item.progress }} / {{ item.totalEpisodes }}
+        {{ item.progress || 0 }} / {{ item.totalEpisodes ? item.totalEpisodes : '?' }}
       </p>
 
       <p v-else class="meta">

@@ -68,16 +68,18 @@ function isOverdue() {
       <p class="status">{{ statusLabels[item.status] }}</p>
 
       <p v-if="item.watchDate">📅 {{ new Date(item.watchDate).toLocaleDateString() }}</p>
+      <!-- требуется поле с добавленной/измененной датой -->
+       <!-- ТИПО ТАКОГО -- <p v-if="item.dateAdded">➕ Добавлено: {{ new Date(item.dateAdded).toLocaleDateString() }}</p> -->
 
       <!-- ========================= -->
       <!-- ПРОГРЕСС -->
       <!-- ========================= -->
+       <!-- запасной вариант для продвижения серии -->
       <p v-if="item.type === 'series'">
-        Прогресс: {{ item.progress }} / {{ item.totalEpisodes }}
-        <!-- ДОБАВЛЕНО 2: кнопка прогресса -->
+        Прогресс: {{ item.progress || 0 }} / {{ item.totalEpisodes ? item.totalEpisodes : '?' }}
+        <!-- кнопка прогресса -->
         <button @click="incProgress" :disabled="item.progress >= item.totalEpisodes" class="progress-btn">+</button>
       </p>
-
       <p v-else>
         ⏱  {{ item.duration }} мин
       </p>
