@@ -19,42 +19,32 @@ const typeFilter = ref("all")
 const statusFilter = ref("all")
 const sortType = ref("date-asc")
 
-const filteredMedia = computed(function () {
-  let list = props.items   // ← используем ПРОП, а не глобальный media
+const filteredMedia = computed(() => {
+  let list = props.items
 
-  // старый фильтр по типу (фильмы/сериалы)
+  // старый фильтр
   if (filter.value === "series") {
-    list = list.filter(function (m) { return m.type === "series" })
+    list = list.filter(m => m.type === "series")
   } else if (filter.value === "film") {
-    list = list.filter(function (m) { return m.type === "film" })
+    list = list.filter(m => m.type === "film")
   }
 
   // новые фильтры
   list = filterByType(list, typeFilter.value)
   list = filterByStatus(list, statusFilter.value)
 
-  // сортировка
+  // сортировка / режим
   if (sortType.value === "date-asc") {
     list = sortByDate(list, "asc")
   } else if (sortType.value === "date-desc") {
     list = sortByDate(list, "desc")
   } else if (sortType.value === "overdue") {
-    var overdueIds = []
-    var overdueList = getOverdue(list)
-    for (var i = 0; i < overdueList.length; i++) {
-      overdueIds.push(overdueList[i].id)
-    }
-    list = list.slice().sort(function (a, b) {
-      var aOverdue = overdueIds.indexOf(a.id) !== -1
-      var bOverdue = overdueIds.indexOf(b.id) !== -1
-      if (aOverdue && !bOverdue) return -1
-      if (!aOverdue && bOverdue) return 1
-      return 0
-    })
+    list = getOverdue(list)
   }
 
   return list
 })
+
 </script>
 
 <template>

@@ -69,13 +69,11 @@ function logout() {
 // =========================
 
 function register(newUser) {
-    var exists = users.value.find(function(u) {
-    return u.login === newUser.login
-    })
+    const exists = users.value.find(u => u.login === newUser.login)
     if (exists) return false
 
   // глубокое клонирование defaultMedia
-  var userMediaCopy = JSON.parse(JSON.stringify(defaultMedia))
+  const userMediaCopy = structuredClone(defaultMedia)
 
     const user = {
         id: users.value.length + 1,
@@ -143,11 +141,7 @@ function addMediaToUser(item) {
     }
 
     // безопасное вычисление maxId
-    let maxId = 0
-    for (let i = 0; i < media.length; i++) {
-        const id = media[i].id
-        if (typeof id === "number" && id > maxId) maxId = id
-    }
+    const maxId = Math.max(0, ...media.map(m => m.id || 0))
 
     const newItem = {
         id: maxId + 1,
@@ -164,7 +158,7 @@ function addMediaToUser(item) {
         image: item.image || null
     }
 
-    console.log("Добавляем:", newItem)
+    // console.log("Добавляем:", newItem)
 
     // создаём новый массив, чтобы реактивность сработала
     const newMedia = [...media, newItem]
@@ -191,7 +185,7 @@ function updateMediaInUser(id, data) {
 
 
 function getCurrentUser() {
-    return JSON.parse(localStorage.getItem("currentUser"))
+    return currentUser.value
 }
 
 

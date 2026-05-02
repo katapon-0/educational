@@ -1,86 +1,77 @@
 import { computed } from "vue"
-import defaultMedia from "../data/defaultMedia"
-// единый источник данных через useUsers
 import { useUsers } from "./useUsers"
 
 // =========================
-// ХРАНИЛИЩЕ МЕДИА — теперь из useUsers
+// СТАТА ИЗ ЮЗЮЗЕРС
 // =========================
-// MOD: media теперь ссылается на userMedia из useUsers
-const { userMedia, updateUserMedia, updateMediaInUser, currentUser } = useUsers()
+const { userMedia, updateUserMedia, updateMediaInUser } = useUsers()
+
 const media = computed(() => userMedia.value)
 
 // =========================
-// ПОЛУЧЕНИЕ ДАННЫХ
+// ИЗМЕНЕНИЕ МЕДИА
 // =========================
-
 function getMedia() {
     return media.value
 }
 
-// получение элемента по ID
 function getMediaById(id) {
     return media.value.find(m => m.id == id)
 }
-
-
-// =========================
-// ДОБАВЛЕНИЕ МЕДИА
-// =========================
 
 function addMedia(item) {
     const maxId = media.value.length
         ? Math.max(...media.value.map(m => m.id))
         : 0
+
     const newItem = {
         id: maxId + 1,
         title: item.title,
         type: item.type,
-        description: item.description || "",
-        status: item.status || "want",
-        watchDate: item.watchDate || null,
-        link: item.link || null,
-        episodeDuration: item.episodeDuration || null,
-        totalEpisodes: item.totalEpisodes || null,
-        duration: item.duration || null,
+        description: item.description ?? "",
+        status: item.status ?? "want",
+        watchDate: item.watchDate ?? null,
+        link: item.link ?? null,
+        episodeDuration: item.episodeDuration ?? null,
+        totalEpisodes: item.totalEpisodes ?? null,
+        duration: item.duration ?? null,
         progress: 0,
-        image: item.image || null
+        image: item.image ?? null
     }
-    // MOD: используем updateUserMedia для синхронизации
-    const newMedia = [...media.value, newItem]
-    updateUserMedia(newMedia)
+
+    updateUserMedia([...media.value, newItem])
 }
 
-// =========================
-// ОБНОВЛЕНИЕ МЕДИА
-// =========================
 function updateMedia(id, data) {
-    // MOD: используем updateMediaInUser вместо прямого изменения
     updateMediaInUser(id, data)
 }
 
-// =========================
-// УДАЛЕНИЕ МЕДИА
-// =========================
 function deleteMedia(id) {
-    // MOD: удаляем через обновление всего массива
-    const newMedia = media.value.filter(m => m.id != id)
-    updateUserMedia(newMedia)
+    updateUserMedia(media.value.filter(m => m.id != id))
 }
 
 // =========================
-// ФИЛЬТРАЦИЯ
+// ФИЛТТРЫ
 // =========================
 function getMediaByType(type) {
     return media.value.filter(m => m.type === type)
 }
 
+// универсальные
+function filterByType(list, type) {
+    return type === "all" ? list : list.filter(m => m.type === type)
+}
+
+function filterByStatus(list, status) {
+    return status === "all" ? list : list.filter(m => m.status === status)
+}
+
 // =========================
-// ДОБАВЛЕНО РАЗРАБОТЧИКОМ 2
-// СТАТУСЫ И ДАТЫ
+// СТАТУСЫ
 // =========================
-var statuses = ["want", "watching", "done", "abandoned"]
-var statusLabels = {
+const statuses = ["want", "watching", "done", "abandoned"]
+
+const statusLabels = {
     want: "Хочу посмотреть",
     watching: "Смотрю",
     done: "Посмотрено",
@@ -88,166 +79,138 @@ var statusLabels = {
 }
 
 function updateStatus(id, newStatus) {
-    if (statuses.indexOf(newStatus) === -1) return
-    // MOD: используем updateMediaInUser
+    if (!statuses.includes(newStatus)) return
     updateMediaInUser(id, { status: newStatus })
 }
 
 function setWatchDate(id, date) {
-    // MOD: используем updateMediaInUser
     updateMediaInUser(id, { watchDate: date })
 }
 
 // =========================
-// ПРОГРЕСС СЕРИАЛОВ
+// ПРОГРЕСС (СЕРИАЛОВ)
 // =========================
 function increaseProgress(id) {
     const item = getMediaById(id)
     if (!item || item.type !== "series") return
     if (item.progress >= item.totalEpisodes) return
 
-    const newProgress = (item.progress || 0) + 1
-    // автоматическая настройка "просмотр" при просмотре первого эпизода
+    const newProgress = (item.progress ?? 0) + 1
+
     if (item.status === "want") {
-        updateMediaInUser(id, { status: "watching", progress: newProgress })
+        updateMediaInUser(id, {
+            status: "watching",
+            progress: newProgress
+        })
     } else {
         updateMediaInUser(id, { progress: newProgress })
     }
 
-    // автоматически помечает как выполненное, когда прогресс достигает 100%
     if (newProgress >= item.totalEpisodes) {
         updateStatus(id, "done")
     }
 }
 
 // =========================
-// ФИЛЬТРАЦИЯ И СОРТИРОВКА (чистые функции)
+// CОРТИРОВКА
 // =========================
-function filterByType(mediaList, type) {
-    if (type === "all") return mediaList
-    return mediaList.filter(function(m) {
-        return m.type === type
+function sortByDate(list, order = "desc") {
+    return [...list].sort((a, b) => {
+        const dateA = a.watchDate ? new Date(a.watchDate) : new Date(8640000000000000)
+        const dateB = b.watchDate ? new Date(b.watchDate) : new Date(8640000000000000)
+
+        return order === "asc"
+            ? dateA - dateB
+            : dateB - dateA
     })
 }
 
-function filterByStatus(mediaList, status) {
-    if (status === "all") return mediaList
-    return mediaList.filter(function(m) {
-        return m.status === status
-    })
-}
-
-function sortByDate(mediaList, order) {
-    var copy = mediaList.slice()
-    return copy.sort(function(a, b) {
-        var dateA = a.watchDate ? new Date(a.watchDate) : new Date(8640000000000000)
-        var dateB = b.watchDate ? new Date(b.watchDate) : new Date(8640000000000000)
-        if (order === "asc") {
-            return dateA - dateB
-        } else {
-            return dateB - dateA
-        }
-    })
-}
-
-function getOverdue(mediaList) {
-    var today = new Date()
+// =========================
+// ПРОСРОЧКА
+// =========================
+function getOverdue(list) {
+    const today = new Date()
     today.setHours(0, 0, 0, 0)
-    return mediaList.filter(function(item) {
+
+    return list.filter(item => {
         if (!item.watchDate) return false
         if (item.status === "done") return false
-        var watchDate = new Date(item.watchDate)
-        return watchDate < today
+
+        return new Date(item.watchDate) < today
     })
 }
 
 // =========================
-// СТАТИСТИКА
+// СТАТА
 // =========================
-function getStats(mediaList) {
-    var want = 0
-    var watching = 0
-    var done = 0
-    var abandoned = 0
-    for (var i = 0; i < mediaList.length; i++) {
-        var m = mediaList[i]
-        if (m.status === "want") want++
-        else if (m.status === "watching") watching++
-        else if (m.status === "done") done++
-        else if (m.status === "abandoned") abandoned++
-    }
-    return {
-        want: want,
-        watching: watching,
-        done: done,
-        abandoned: abandoned,
-        total: mediaList.length
-    }
+function getStats(list) {
+    return list.reduce(
+        (acc, m) => {
+            acc[m.status] = (acc[m.status] || 0) + 1
+            acc.total++
+            return acc
+        },
+        { want: 0, watching: 0, done: 0, abandoned: 0, total: 0 }
+    )
 }
 
 // =========================
-// "ЧТО ПОСМОТРЕТЬ СЕГОДНЯ" (МОДИФИЦИРОВАНО: случайный выбор)
+// ПРЕДЛОЖЕНИЕ
 // =========================
-function getSuggestion(mediaList) {
-    // MOD: random selection with overdue priority
-    var candidates = []
-    var overdueCandidates = []
-    var today = new Date()
+function getSuggestion(list) {
+    const today = new Date()
     today.setHours(0, 0, 0, 0)
 
-    for (var i = 0; i < mediaList.length; i++) {
-        var item = mediaList[i]
-        if (item.status !== 'want' && item.status !== 'watching') continue
-        if (item.watchDate) {
-            var watchDate = new Date(item.watchDate)
-            if (watchDate < today) {
-                overdueCandidates.push(item)
-            } else {
-                candidates.push(item)
-            }
+    const overdue = []
+    const normal = []
+
+    for (const item of list) {
+        if (item.status !== "want" && item.status !== "watching") continue
+
+        if (item.watchDate && new Date(item.watchDate) < today) {
+            overdue.push(item)
         } else {
-            candidates.push(item)
+            normal.push(item)
         }
     }
 
-    if (overdueCandidates.length > 0) {
-        var randomIndex = Math.floor(Math.random() * overdueCandidates.length)
-        return overdueCandidates[randomIndex]
-    }
-    if (candidates.length > 0) {
-        var randomIndex = Math.floor(Math.random() * candidates.length)
-        return candidates[randomIndex]
-    }
-    return null
+    const pool = [...overdue, ...normal]
+    if (!pool.length) return null
+
+    return pool[Math.floor(Math.random() * pool.length)]
 }
 
 // =========================
-// ЭКСПОРТ COMPOSABLE
+// ЭКСПОПТ :-D
 // =========================
 export function useMedia() {
     return {
-        // state
-        media: media,
-        // CRUD
-        getMedia: getMedia,
-        getMediaById: getMediaById,
-        addMedia: addMedia,
-        updateMedia: updateMedia,
-        deleteMedia: deleteMedia,
+        media,
+
+        getMedia,
+        getMediaById,
+        addMedia,
+        updateMedia,
+        deleteMedia,
+
         // фильтры
-        getMediaByType: getMediaByType,
-        // аналитика
-        getStats: getStats,
-        // ДОБАВЛЕНО РАЗРАБОТЧИКОМ 2
-        updateStatus: updateStatus,
-        setWatchDate: setWatchDate,
-        increaseProgress: increaseProgress,
-        filterByType: filterByType,
-        filterByStatus: filterByStatus,
-        sortByDate: sortByDate,
-        getOverdue: getOverdue,
-        getSuggestion: getSuggestion,
-        statuses: statuses,
-        statusLabels: statusLabels
+        getMediaByType,
+        filterByType,
+        filterByStatus,
+
+        // статус
+        updateStatus,
+        setWatchDate,
+        statuses,
+        statusLabels,
+
+        // прогресс
+        increaseProgress,
+
+        // сортировка
+        sortByDate,
+        getOverdue,
+        getStats,
+        getSuggestion
     }
 }

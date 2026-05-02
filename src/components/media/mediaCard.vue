@@ -13,7 +13,7 @@ const props = defineProps({
 const emit = defineEmits(["delete"])
 
 const router = useRouter()
-const { updateStatus, statusLabels, increaseProgress, updateMedia } = useMedia()
+const { updateStatus, statusLabels, increaseProgress, updateMedia, setWatchDate } = useMedia()
 
 // мы проверяем,это серик или фильм
 const isSeries = computed(() => props.item.type === "series")
@@ -22,8 +22,11 @@ const statusLabel = computed(() => statusLabels[props.item.status] ?? props.item
 
 const formattedWatchDate = computed(() => {
   if (!props.item.watchDate) return ""
-  return new Date(props.item.watchDate).toLocaleDateString("ru-RU") //для форматирования в красивую дату
-  // https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString
+
+  const date = new Date(props.item.watchDate)
+  if (Number.isNaN(date.getTime())) return ""
+
+  return date.toLocaleDateString("ru-RU")
 })
 
 const formattedDuration = computed(() => {
@@ -60,6 +63,12 @@ const isOverdue = computed(() => {
   return watchDate < today //если дата просмотра меньше сегодняшней даты -> просрочено
 })
 
+//дата добавления
+const formattedDateAdded = computed(() => {
+  if (!props.item.dateAdded) return ""
+  return new Date(props.item.dateAdded).toLocaleDateString("ru-RU")
+})
+
 function open() {
   router.push(`/media/${props.item.id}`)
 }
@@ -89,6 +98,23 @@ function decProgress() {
     updateStatus(props.item.id, "want") //если прогресс 0, кидаем в статус "хочу посмотреть"
   }
 }
+
+function onWatchDateChange(event) {
+  const date = event.target.value || null
+  setWatchDate(props.item.id, date)
+}
+
+const progressPercent = computed(() => {
+  if (!isSeries.value) return 0
+
+  const total = totalEpisodes.value
+  const current = currentProgress.value
+
+  if (!total || total === 0) return 0
+
+  return Math.min((current / total) * 100, 100)
+})
+
 </script>
 
 <template>
@@ -96,22 +122,38 @@ function decProgress() {
     <img :src="item.image" :alt="item.title" class="cover" />
 
     <div class="info">
+
       <h3 class="title">{{ item.title }}</h3>
 
-      <p class="type">
-        {{ isSeries ? "Сериал" : "Фильм" }}
-      </p>
+      <p class="type">{{ isSeries ? "Сериал" : "Фильм" }}</p>
 
       <p class="status">{{ statusLabel }}</p>
 
+      <p v-if="isOverdue" class="badge overdue-badge">⚠ Просрочено</p>
+
       <p v-if="item.watchDate" class="meta">
-        📅 {{ formattedWatchDate }}
+        📅 Смотреть до: {{ formattedWatchDate }}
       </p>
 
+      <p v-if="item.dateAdded" class="meta">
+        ➕ Добавлено: {{ formattedDateAdded }}
+      </p>
+
+      <div v-if="item.status !== 'done'" class="date-picker">
+        <label class="meta">Назначить дату просмотра:</label>
+
+        <input type="date" :value="item.watchDate ?? ''" @change="onWatchDateChange" />
+      </div>
+
       <div v-if="isSeries" class="progress">
+
         <p class="meta">
           Прогресс: {{ progressText }}
         </p>
+
+        <div class="progress-bar">
+          <div class="fill" :style="{ width: progressPercent + '%' }"></div>
+        </div>
 
         <div class="progress-controls">
           <button type="button" class="progress-btn" @click="decProgress">
@@ -125,17 +167,37 @@ function decProgress() {
       </div>
 
       <p v-else class="meta">
-        ⏱ {{ formattedDuration }} мин
+        ⏱ {{ item.duration ?? "?" }} мин
       </p>
 
       <div class="buttons">
-        <button type="button" @click="open" class="btn-open">Открыть</button>
-        <button type="button" @click="changeStatus('want')" class="status-btn">Хочу</button>
-        <button type="button" @click="changeStatus('watching')" class="status-btn">Смотрю</button>
-        <button type="button" @click="changeStatus('done')" class="status-btn">Готово</button>
-        <button type="button" @click="changeStatus('abandoned')" class="status-btn">Заброшено</button>
-        <button type="button" @click="remove" class="btn-delete">Удалить</button>
+
+        <button type="button" @click="open" class="btn-open">
+          Открыть
+        </button>
+
+        <button type="button" @click="changeStatus('want')" class="status-btn">
+          Хочу
+        </button>
+
+        <button type="button" @click="changeStatus('watching')" class="status-btn">
+          Смотрю
+        </button>
+
+        <button type="button" @click="changeStatus('done')" class="status-btn">
+          Готово
+        </button>
+
+        <button type="button" @click="changeStatus('abandoned')" class="status-btn">
+          Заброшено
+        </button>
+
+        <button type="button" @click="remove" class="btn-delete">
+          Удалить
+        </button>
+
       </div>
+
     </div>
   </article>
 </template>
@@ -156,11 +218,6 @@ function decProgress() {
   border-color: #1a172c;
   box-shadow: 0 6px 18px rgba(26, 23, 44, 0.08);
   transform: translateY(-1px);
-}
-
-.card.overdue {
-  background: #fdeabf;
-  border-color: #fdb688;
 }
 
 .cover {
@@ -285,4 +342,10 @@ function decProgress() {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.overdue-text {
+  color: #c36b65;
+  font-weight: 600;
+}
+
 </style>

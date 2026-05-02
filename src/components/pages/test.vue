@@ -178,30 +178,4 @@ function increaseProgress(item) {
   </div>
 </template>
 
-<style scoped>
-.home {
-  padding: 20px;
-  font-family: Arial;
-}
-
-.auth input,
-.add-block input,
-.add-block select {
-  display: block;
-  margin: 6px 0;
-}
-
-.card {
-  display: flex;
-  gap: 10px;
-  margin: 10px 0;
-  padding: 10px;
-  border: 1px solid #ccc;
-}
-
-.user-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-</style>
+ 
