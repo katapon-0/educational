@@ -34,7 +34,7 @@ function handleDelete(id) {
     <div v-if="!currentUser" class="guest">
       <div class="guest-card">
 
-        <img src="../../assets/icons/suggetion.png" class="guest-illustration" />
+        <img src="../../assets/icons/name.png" class="guest-illustration" />
 
         <h1 class="guest-title">
           Ваш личный список просмотра
@@ -347,9 +347,9 @@ function handleDelete(id) {
 }
 
 .guest-illustration {
-  width: 120px;
-  height: 120px;
-  margin-bottom: 16px;
+  width: 350px;
+  height: 350px;
+  margin-bottom: 10px;
   opacity: 0.9;
 }
 
