@@ -2,6 +2,7 @@
 import { computed, ref } from "vue"
 import { useRouter } from "vue-router"
 import { useUsers } from "../../composables/useUsers"
+import logowl from "../../assets/icons/logowl.png"
 import AddItemModal from "../Media/AddItemModal.vue"  // модалка напрямую
 
 const router = useRouter()
@@ -35,38 +36,49 @@ function closeAddModal() {
 
 <template>
   <header class="topbar">
-    <div class="left">
-      <button class="brand" @click="goHome">WatchList</button>
-    </div>
-    <div class="right">
-      <div v-if="!isAuth" class="auth">
-        <button @click="goLogin" class="btn">Войти</button>
+    <div class="topbar-inner">
+      <div class="left">
+        <button class="brand" @click="goHome">
+          <img :src="logowl" class="logo" alt="logo" />
+          <span>WatchList</span>
+        </button>
       </div>
-      <div v-else class="user">
-        <span class="username">{{ userName }}</span>
-        <button @click="openAddModal" class="btn btn-accent">+ Добавить</button>
-        <button @click="handleLogout" class="btn">Выйти</button>
+
+      <div class="right">
+        <div v-if="!isAuth" class="auth">
+          <button @click="goLogin" class="btn">Войти</button>
+        </div>
+        <div v-else class="user">
+          <span class="username">{{ userName }}</span>
+          <button @click="openAddModal" class="btn btn-accent">+ Добавить</button>
+          <button @click="handleLogout" class="btn">Выйти</button>
+        </div>
       </div>
     </div>
   </header>
-  <!-- модалка добавления -->
+
   <AddItemModal v-if="addModalVisible" @close="closeAddModal" />
 </template>
 
 <style scoped>
 .topbar {
   width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #1a172c;
+  color: #fefefe;
+  border-radius: 0 0 14px 14px;
+}
+
+.topbar-inner {
+  width: 65vw;
+  margin: 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 14px 20px;
-  background: #1a172c;
-  color: #fefefe;
-  border-radius: 0 0 14px 14px;
-  font-family: Arial;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  box-sizing: border-box;
 }
 
 .left {
@@ -76,7 +88,7 @@ function closeAddModal() {
 
 .brand {
   font-weight: 600;
-  font-size: 15px;
+  font-size: 20px;
   letter-spacing: 0.3px;
   background: none;
   border: none;
@@ -85,9 +97,19 @@ function closeAddModal() {
   padding: 6px 10px;
   border-radius: 8px;
   transition: 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
+
 .brand:hover {
   background: rgba(255, 255, 255, 0.08);
+}
+
+.logo {
+  width: 32px;
+  height: 25px;
+  object-fit: contain;
 }
 
 .right {
@@ -103,20 +125,20 @@ function closeAddModal() {
 }
 
 .username {
-  font-size: 14px;
-  opacity: 0.8;
+  font-size: 17px;
 }
 
 .btn {
   padding: 6px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(197, 194, 210, 0.2);
   border-radius: 8px;
   background: transparent;
   color: #fefefe;
-  font-size: 13px;
+  font-size: 15px;
   cursor: pointer;
   transition: all 0.2s ease;
 }
+
 .btn:hover {
   background: rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.3);
@@ -127,7 +149,10 @@ function closeAddModal() {
   color: #1a172c;
   border: none;
 }
+
 .btn-accent:hover {
-  opacity: 0.9;
+  background: #ffdac1;
+  border: 2px;
+  border-color: #fdb688;
 }
 </style>

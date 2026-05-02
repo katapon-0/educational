@@ -74,72 +74,58 @@ function submit() {
 
 <template>
   <div class="form">
-
     <h2>Регистрация</h2>
 
-    <div class="field">
-      <input
-        v-model="form.login"
-        placeholder="Логин"
-      />
-      <p v-if="errors.login" class="error">
-        {{ errors.login }}
+    <form class="form" @submit.prevent="submit">
+
+      <div class="field">
+        <input v-model="form.login" placeholder="Логин" />
+        <p v-if="errors.login" class="error">{{ errors.login }}</p>
+      </div>
+
+      <div class="field">
+        <input v-model="form.name" placeholder="Имя" />
+        <p v-if="errors.name" class="error">{{ errors.name }}</p>
+      </div>
+
+      <div class="field">
+        <input v-model="form.password" type="password" placeholder="Пароль" />
+        <p v-if="errors.password" class="error">{{ errors.password }}</p>
+      </div>
+
+      <p v-if="errors.general" class="error">
+        {{ errors.general }}
       </p>
-    </div>
 
-    <div class="field">
-      <input
-        v-model="form.name"
-        placeholder="Имя"
-      />
-      <p v-if="errors.name" class="error">
-        {{ errors.name }}
-      </p>
-    </div>
+      <div class="buttons">
+        <button type="submit">
+          Зарегистрироваться
+        </button>
+      </div>
 
-    <div class="field">
-      <input
-        v-model="form.password"
-        type="password"
-        placeholder="Пароль"
-      />
-      <p v-if="errors.password" class="error">
-        {{ errors.password }}
-      </p>
-    </div>
-
-    <button @click="submit">
-      Зарегистрироваться
-    </button>
-
+    </form>
   </div>
 </template>
 
 <style scoped>
 .form {
   width: 100%;
-  max-width: 360px;
   padding: 22px;
-  background: #ffffff;
-  border: 1px solid #e5e5e5;
-  border-radius: 18px;
-  box-shadow: 0 6px 18px rgba(26, 23, 44, 0.06);
 
   display: flex;
   flex-direction: column;
   gap: 14px;
 
   color: #1a172c;
-  font-family: Arial, sans-serif;
+  box-sizing: border-box;
 }
-
 
 .form h2 {
   margin: 0;
-  font-size: 20px;
+
+  text-align: center;
   color: #1a172c;
 }
-
 
 .field {
   display: flex;
@@ -148,43 +134,59 @@ function submit() {
 }
 
 input {
-  padding: 10px 12px;
-  border-radius: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
   border: 1px solid #e5e5e5;
   background: #fefefe;
   color: #1a172c;
-  transition: all 0.2s;
   font-size: 14px;
+  transition: all 0.2s;
+  outline: none;
 }
 
 input:focus {
-  outline: none;
   border-color: #fdb688;
   box-shadow: 0 0 0 3px rgba(253, 184, 136, 0.25);
+}
+
+input::placeholder {
+  color: rgba(26, 23, 44, 0.4);
 }
 
 .error {
   color: #b24a4a;
   font-size: 12px;
   margin: 0;
+  padding-left: 4px;
+}
+
+.error.general {
+  text-align: center;
+  margin-top: -8px;
+}
+
+.buttons {
+  display: flex;
+  justify-content: stretch;
 }
 
 button {
-  margin-top: 8px;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: none;
+  width: 100%;
+  max-width: 200px;
 
+  border: none;
   background: #1a172c;
   color: #fefefe;
-
+  font-size: 15px;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
-  font-size: 14px;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(26, 23, 44, 0.2);
 }
 
 button:hover {
-  opacity: 0.92;
-  transform: translateY(-1px);
+  background: #2d2a44;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(26, 23, 44, 0.3);
 }
 </style>

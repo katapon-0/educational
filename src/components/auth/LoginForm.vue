@@ -5,111 +5,90 @@ import { useUsers } from "../../composables/useUsers"
 
 const router = useRouter()
 const { login } = useUsers()
- 
+
 const form = ref({
-    login: "",
-    password: ""
+  login: "",
+  password: ""
 })
- 
+
 
 const errors = ref({})
- 
+
 function validate() {
-    errors.value = {}
+  errors.value = {}
 
-    const loginVal = form.value.login.trim()
-    const passwordVal = form.value.password.trim()
+  const loginVal = form.value.login.trim()
+  const passwordVal = form.value.password.trim()
 
-    if (!loginVal) {
-        errors.value.login = "Введите логин"
-    }
+  if (!loginVal) {
+    errors.value.login = "Введите логин"
+  }
 
-    if (!passwordVal) {
-        errors.value.password = "Введите пароль"
-    }
+  if (!passwordVal) {
+    errors.value.password = "Введите пароль"
+  }
 
-    return Object.keys(errors.value).length === 0
+  return Object.keys(errors.value).length === 0
 }
- 
+
 function submit() {
-    if (!validate()) return
+  if (!validate()) return
 
-    const success = login(form.value.login.trim(), form.value.password.trim())
+  const success = login(form.value.login.trim(), form.value.password.trim())
 
-    if (!success) {
-        errors.value.general = "Неверный логин или пароль"
-        return
-    }
+  if (!success) {
+    errors.value.general = "Неверный логин или пароль"
+    return
+  }
 
-    router.push("/")
+  router.push("/")
 }
 </script>
 
 <template>
-    <div class="auth">
+  <div class="form">
+    <h2>Вход</h2>
 
-        <h2>Вход</h2>
+    <form @submit.prevent="submit" class="form">
 
-        <form @submit.prevent="submit" class="form">
+      <div class="field">
+        <input v-model="form.login" placeholder="Логин" />
+        <p v-if="errors.login" class="error">
+          {{ errors.login }}
+        </p>
+      </div>
 
-            <div class="field">
-                <input v-model="form.login" placeholder="Логин" />
-                <p v-if="errors.login" class="error">
-                    {{ errors.login }}
-                </p>
-            </div>
+      <div class="field">
+        <input v-model="form.password" type="password" placeholder="Пароль" />
+        <p v-if="errors.password" class="error">
+          {{ errors.password }}
+        </p>
+      </div>
 
-            <div class="field">
-                <input v-model="form.password" type="password" placeholder="Пароль" />
-                <p v-if="errors.password" class="error">
-                    {{ errors.password }}
-                </p>
-            </div>
+      <p v-if="errors.general" class="error">
+        {{ errors.general }}
+      </p>
 
-            <p v-if="errors.general" class="error">
-                {{ errors.general }}
-            </p>
+      <div class="buttons">
+        <button type="submit">
+          Войти
+        </button>
+      </div>
 
-            <div class="buttons">
-                <button type="submit">
-                    Войти
-                </button>
-            </div>
+    </form>
 
-        </form>
-
-    </div>
+  </div>
 </template>
 
 <style scoped>
-.auth {
-  width: 100%;
-  max-width: 380px;
-  padding: 28px 24px;
-  background: #ffffff;
-  border: 1px solid #e5e5e5;
-  border-radius: 24px;
-  box-shadow: 0 8px 24px rgba(26, 23, 44, 0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  color: #1a172c;
-  font-family: Arial, sans-serif;
-  margin: 0 auto; /* центрирование, если родитель не flex */
-}
-
-.auth h2 {
-  margin: 0;
-  font-size: 22px;
-  font-weight: 600;
-  text-align: center;
-  color: #1a172c;
-}
-
 .form {
+  width: 100%;
+  padding: 22px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
+  color: #1a172c;
+  box-sizing: border-box;
 }
 
 .field {
@@ -152,14 +131,13 @@ input::placeholder {
 
 .buttons {
   display: flex;
-  justify-content: center;
+  justify-content: stretch;
 }
 
 button {
   width: 100%;
   max-width: 200px;
-  padding: 12px 20px;
-  border-radius: 12px;
+
   border: none;
   background: #1a172c;
   color: #fefefe;

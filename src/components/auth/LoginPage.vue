@@ -7,45 +7,58 @@ const mode = ref("login")
 </script>
 
 <template>
-    <div class="auth-page">
+  <div class="auth-page">
 
-        <div class="tabs">
-            <button :class="{ active: mode === 'login' }" @click="mode = 'login'">
-                Вход
-            </button>
+    <div class="auth-container">
 
-            <button :class="{ active: mode === 'register' }" @click="mode = 'register'">
-                Регистрация
-            </button>
-        </div>
+      <div class="tabs">
+        <button :class="{ active: mode === 'login' }" @click="mode = 'login'">Вход</button>
+        <button :class="{ active: mode === 'register' }" @click="mode = 'register'">Регистрация</button>
+      </div>
 
+      <div class="auth-box">
         <LoginForm v-if="mode === 'login'" />
         <RegisterForm v-else />
+      </div>
 
     </div>
+
+  </div>
 </template>
 
 <style scoped>
 .auth-page {
   min-height: 100vh;
   background: #fefefe;
+
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+
   padding: 20px;
-  font-family: Arial, sans-serif;
-  color: #1a172c;
 }
 
+.auth-container {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 20px;
+  padding: 16px;
+}
+
+.auth-box {
+  width: 100%;
+}
 
 .tabs {
   display: flex;
-  gap: 10px;
-  margin-bottom: 24px;
+  gap: 6px;
+
   padding: 6px;
+  margin-bottom: 16px;
+
   border: 1px solid #e5e5e5;
   border-radius: 14px;
+
   background: #ffffff;
 }
 
@@ -67,10 +80,5 @@ const mode = ref("login")
 .tabs button.active {
   background: #1a172c;
   color: #fefefe;
-}
-
-.auth-page :deep(input),
-.auth-page :deep(button) {
-  font-family: inherit;
 }
 </style>

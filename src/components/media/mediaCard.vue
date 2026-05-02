@@ -1,9 +1,13 @@
 <script setup>
+import { computed } from "vue"
 import { useRouter } from "vue-router"
 import { useMedia } from "../../composables/useMedia"
 
 const props = defineProps({
-  item: Object
+  item: {
+    type: Object,
+    required: true,
+  },
 })
 
 const emit = defineEmits(["delete"])
@@ -11,21 +15,55 @@ const emit = defineEmits(["delete"])
 const router = useRouter()
 const { updateStatus, statusLabels, increaseProgress, updateMedia } = useMedia()
 
-function markFilmWatched() {
-    changeStatus('done')
-    router.push('/')  
-}
+// мы проверяем,это серик или фильм
+const isSeries = computed(() => props.item.type === "series")
 
-// =========================
-// ОТКРЫТЬ СТРАНИЦУ
-// =========================
+const statusLabel = computed(() => statusLabels[props.item.status] ?? props.item.status)
+
+const formattedWatchDate = computed(() => {
+  if (!props.item.watchDate) return ""
+  return new Date(props.item.watchDate).toLocaleDateString("ru-RU") //для форматирования в красивую дату
+  // https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Global_Objects/Date/toLocaleDateString
+})
+
+const formattedDuration = computed(() => {
+  return props.item.duration ?? "?" //если есть длительность показываем, иначе ?
+})
+
+const currentProgress = computed(() => props.item.progress ?? 0)
+
+const totalEpisodes = computed(() => props.item.totalEpisodes ?? null)
+
+const progressText = computed(() => {
+  if (!isSeries.value) return ""
+  return `${currentProgress.value} / ${totalEpisodes.value ?? "?"}`
+})
+
+//можно ли увеличить прогресс
+const canIncreaseProgress = computed(() => {
+  if (!isSeries.value) return false //если это не сериал-> нельзя
+  if (!totalEpisodes.value) return true //если хз скок серий -> можно
+  return currentProgress.value < totalEpisodes.value //если ещё не достигли конца -> моэно
+})
+
+//просрочено ли?
+const isOverdue = computed(() => {
+  if (!props.item.watchDate) return false //если нет даиы просмотра-> не просрочено 
+  if (props.item.status === "done") return false //если отмечено как просмотрено, -> просрочено 
+
+  const today = new Date() //берем сегодняшнюю дату
+  today.setHours(0, 0, 0, 0) //обнуляем время
+
+  const watchDate = new Date(props.item.watchDate) //превращаем дату просмотра в тип date
+  watchDate.setHours(0, 0, 0, 0) //обнуляем
+
+  return watchDate < today //если дата просмотра меньше сегодняшней даты -> просрочено
+})
+
 function open() {
-  router.push("/media/" + props.item.id)
+  router.push(`/media/${props.item.id}`)
 }
 
-// =========================
-// УДАЛИТЬ
-// =========================
 function remove() {
   emit("delete", props.item.id)
 }
@@ -34,91 +72,72 @@ function changeStatus(status) {
   updateStatus(props.item.id, status)
 }
 
+//увеличить прогресс
 function incProgress() {
-  if (props.item.type === "series") {
-    increaseProgress(props.item.id)
-  }
+  if (!isSeries.value || !canIncreaseProgress.value) return //если это не сериал и нельзя увеличивать -> нельзя
+  increaseProgress(props.item.id) //иначе разрешаем
 }
 
-function isOverdue() {
-  if (!props.item.watchDate) return false
-  if (props.item.status === "done") return false
-  var today = new Date()
-  today.setHours(0, 0, 0, 0)
-  var watchDate = new Date(props.item.watchDate)
-  return watchDate < today
-}
-
-// уменьшение прогресса (только для сериалов) с возвратом в "хочу посмотреть" при 0
+//уменьшить прогресс
 function decProgress() {
-  if (props.item.type !== 'series') return
-  let newProgress = (props.item.progress || 0) - 1
-  if (newProgress < 0) newProgress = 0
+  if (!isSeries.value) return //если это не сериал -> нельзя
+
+  const newProgress = Math.max((props.item.progress ?? 0) - 1, 0) //уменьшаем на единичку, но ограничиваем чтобы нельзя было опустить ниже нуля
   updateMedia(props.item.id, { progress: newProgress })
+
   if (newProgress === 0) {
-    updateStatus(props.item.id, 'want')
+    updateStatus(props.item.id, "want") //если прогресс 0, кидаем в статус "хочу посмотреть"
   }
 }
-
 </script>
 
 <template>
-  <div class="card" :class="{ overdue: isOverdue() }">
+  <article class="card" :class="{ overdue: isOverdue }">
+    <img :src="item.image" :alt="item.title" class="cover" />
 
-    <!-- ========================= -->
-    <!-- ОБЛОЖКА -->
-    <!-- ========================= -->
-    <img :src="item.image" class="cover" />
-
-    <!-- ========================= -->
-    <!-- ИНФО -->
-    <!-- ========================= -->
     <div class="info">
-
-      <h3>{{ item.title }}</h3>
+      <h3 class="title">{{ item.title }}</h3>
 
       <p class="type">
-        {{ item.type === 'series' ? 'Сериал' : 'Фильм' }}
+        {{ isSeries ? "Сериал" : "Фильм" }}
       </p>
 
-      <p class="status">{{ statusLabels[item.status] }}</p>
+      <p class="status">{{ statusLabel }}</p>
 
-      <p v-if="item.watchDate">📅 {{ new Date(item.watchDate).toLocaleDateString() }}</p>
-      <!-- требуется поле с добавленной/измененной датой -->
-       <!-- ТИПО ТАКОГО -- <p v-if="item.dateAdded">➕ Добавлено: {{ new Date(item.dateAdded).toLocaleDateString() }}</p> -->
-
-      <!-- ========================= -->
-      <!-- ПРОГРЕСС -->
-      <!-- ========================= -->
-       <!-- запасной вариант для продвижения серии -->
-      <p v-if="item.type === 'series'">
-        Прогресс: {{ item.progress || 0 }} / {{ item.totalEpisodes ? item.totalEpisodes : '?' }}
-        <!-- отключить +, если значение totalEpisodes отсутствует или достигнуто -->
-        <!-- кнопка прогресса -->
-        <button @click="decProgress" class="progress-btn">–</button>
-        <button @click="incProgress" :disabled="!item.totalEpisodes || item.progress >= item.totalEpisodes" class="progress-btn">+</button>
-      </p>
-      <p v-else>
-        ⏱ {{ item.duration || '?' }} мин       
+      <p v-if="item.watchDate" class="meta">
+        📅 {{ formattedWatchDate }}
       </p>
 
-      <!-- ========================= -->
-      <!-- КНОПКИ (ДОБАВЛЕНЫ СТАТУСЫ)-->
-      <!-- ========================= -->
-      <div class="buttons">
+      <div v-if="isSeries" class="progress">
+        <p class="meta">
+          Прогресс: {{ progressText }}
+        </p>
 
-        <button @click="open" class="btn-open">Открыть</button>
-        <button @click="changeStatus('want')" class="status-btn">Хочу</button>
-        <button @click="changeStatus('watching')" class="status-btn">Смотрю</button>
-        <button @click="changeStatus('done')" class="status-btn">Готово</button>
-        <button @click="changeStatus('abandoned')" class="status-btn">Заброшено</button>
-        <button @click="remove" class="btn-delete">Удалить</button>
+        <div class="progress-controls">
+          <button type="button" class="progress-btn" @click="decProgress">
+            –
+          </button>
 
+          <button type="button" class="progress-btn" :disabled="!canIncreaseProgress" @click="incProgress">
+            +
+          </button>
+        </div>
       </div>
 
-    </div>
+      <p v-else class="meta">
+        ⏱ {{ formattedDuration }} мин
+      </p>
 
-  </div>
+      <div class="buttons">
+        <button type="button" @click="open" class="btn-open">Открыть</button>
+        <button type="button" @click="changeStatus('want')" class="status-btn">Хочу</button>
+        <button type="button" @click="changeStatus('watching')" class="status-btn">Смотрю</button>
+        <button type="button" @click="changeStatus('done')" class="status-btn">Готово</button>
+        <button type="button" @click="changeStatus('abandoned')" class="status-btn">Заброшено</button>
+        <button type="button" @click="remove" class="btn-delete">Удалить</button>
+      </div>
+    </div>
+  </article>
 </template>
 
 <style scoped>
@@ -130,6 +149,7 @@ function decProgress() {
   background: #fefefe;
   color: #1a172c;
   transition: all 0.2s ease;
+  padding: 14px;
 }
 
 .card:hover {
@@ -158,21 +178,21 @@ function decProgress() {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 15px;
+  gap: 18px;
   min-width: 0;
 }
 
-.info h3 {
+.title {
   color: #1a172c;
   margin: 0;
-  font-size: 18px;
+  font-size: 25px;
   line-height: 1.2;
 }
 
 .type,
 .status,
-.info p {
-  font-size: 13px;
+.meta {
+  font-size: 17px;
   color: rgba(26, 23, 44, 0.72);
   margin: 0;
 }
@@ -184,29 +204,41 @@ function decProgress() {
   border-radius: 999px;
   background: #fdeabf;
   color: #1a172c;
-  font-weight: 800;
+  font-weight: 600;
+}
+
+.progress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.progress-controls {
+  display: flex;
+  gap: 8px;
 }
 
 .buttons {
   display: flex;
   gap: 6px;
-  margin-top: 8px;
   flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 8px;
 }
 
 .buttons button {
-  margin-top: 10px;
   border-radius: 999px;
   cursor: pointer;
   transition: all 0.2s ease;
-  padding: 10px 25px;
-  font-size: 13px;
+  padding: 9px 26px;
+  font-size: 17px;
 }
 
 .btn-open {
   background: #1a172c;
   color: #fefefe;
-  border-color: #1a172c;
+  border: 1px solid #1a172c;
 }
 
 .btn-open:hover {
@@ -216,7 +248,7 @@ function decProgress() {
 .status-btn {
   background: #fefefe;
   color: #1a172c;
-  border-color: #dcdcdc;
+  border: 1px solid #dcdcdc;
 }
 
 .status-btn:hover {
@@ -227,25 +259,26 @@ function decProgress() {
 .btn-delete {
   background: #fefefe;
   color: #1a172c;
-  border-color: #dcdcdc;
+  border: 1px solid #dcdcdc;
 }
 
 .btn-delete:hover {
-  background: #fdeabf;
-  border-color: #fdb688;
+  background: #c36b65;
+  border-color: #8b2424;
+  color: #fff;
 }
 
 .progress-btn {
-  border: none;
-  margin-left: 4px;
-  padding: 2px 8px;
+  border: 1px solid #dcdcdc;
+  padding: 2px 10px;
   border-radius: 999px;
   cursor: pointer;
   transition: all 0.2s ease;
+  background: #1a172c;
 }
 
-.progress-btn:hover {
-  background: #fdeabf;
+.progress-btn:hover:not(:disabled) {
+  background: #fdb688;
 }
 
 .progress-btn:disabled {

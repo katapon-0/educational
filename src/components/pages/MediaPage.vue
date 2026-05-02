@@ -213,8 +213,6 @@ function markAsWatched() {
   max-width: 720px;
   margin: 40px auto;
   padding: 0 16px;
-
-  font-family: Arial, sans-serif;
   color: #1a172c;
 
   display: flex;
