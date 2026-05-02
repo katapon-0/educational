@@ -26,12 +26,11 @@ const manualForm = ref({
 // ДОБАВЛЕНИЕ ИЗ БАЗЫ/ теперь через find
 // =========================
 function addSelected() {
-  if (!selectedId.value) return
+  if (!validateSelect()) return
 
   const selected = defaultMedia.find(item => item.id === selectedId.value)
   if (!selected) return
 
-  // базовая структура
   const newItem = {
     title: selected.title,
     type: selected.type,
@@ -41,7 +40,6 @@ function addSelected() {
     image: selected.image || ""
   }
 
-  // добавляем специфичные поля
   if (selected.type === "series") {
     newItem.totalEpisodes = selected.totalEpisodes
   } else {
@@ -49,6 +47,8 @@ function addSelected() {
   }
 
   addMediaToUser(newItem)
+
+  successMessage.value = "Добавлено успешно"
   emit("close")
 }
 
@@ -56,7 +56,7 @@ function addSelected() {
 // РУЧНОЕ ДОБАВЛЕНИЕ
 // =========================
 function addManual() {
-  if (!manualForm.value.title) return
+  if (!validateManual()) return
 
   const newItem = {
     title: manualForm.value.title,
@@ -74,8 +74,59 @@ function addManual() {
   }
 
   addMediaToUser(newItem)
+
+  successMessage.value = "Добавлено успешно"
   emit("close")
 }
+
+const errors = ref({})
+const successMessage = ref("")
+
+
+function validateSelect() {
+  errors.value = {}
+  successMessage.value = ""
+
+  if (!selectedId.value) {
+    errors.value.selectedId = "Выберите фильм или сериал"
+  }
+
+  return Object.keys(errors.value).length === 0
+}
+
+function validateManual() {
+  errors.value = {}
+  successMessage.value = ""
+
+  if (!manualForm.value.title?.trim()) {
+    errors.value.title = "Введите название"
+  }
+
+  if (!manualForm.value.type) {
+    errors.value.type = "Выберите тип"
+  }
+
+  if (manualForm.value.type === "series") {
+    if (
+      manualForm.value.totalEpisodes === null ||
+      manualForm.value.totalEpisodes <= 0
+    ) {
+      errors.value.totalEpisodes = "Введите количество серий"
+    }
+  }
+
+  if (manualForm.value.type === "film") {
+    if (
+      manualForm.value.duration === null ||
+      manualForm.value.duration <= 0
+    ) {
+      errors.value.duration = "Введите длительность"
+    }
+  }
+
+  return Object.keys(errors.value).length === 0
+}
+
 </script>
 
 <template>
@@ -101,6 +152,10 @@ function addManual() {
               {{ item.title }} ({{ item.type === "series" ? "Сериал" : "Фильм" }})
             </option>
           </select>
+
+          <small v-if="errors.selectedId" class="error">
+            {{ errors.selectedId }}
+          </small>
           <div class="actions">
             <button @click="addSelected" :disabled="!selectedId">Добавить</button>
             <button @click="$emit('close')">Отмена</button>
@@ -110,20 +165,28 @@ function addManual() {
         <!-- РУЧНОЕ ДОБАВЛЕНИЕ -->
         <div v-else>
           <input v-model="manualForm.title" placeholder="Название *" />
+          <small v-if="errors.title" class="error">{{ errors.title }}</small>
           <select v-model="manualForm.type">
             <option value="film">Фильм</option>
             <option value="series">Сериал</option>
           </select>
+
+          <small v-if="errors.type" class="error">{{ errors.type }}</small>
           <input type="date" v-model="manualForm.watchDate" placeholder="Дата просмотра" />
           <input v-model="manualForm.link" placeholder="Ссылка" />
           <input v-model="manualForm.image" placeholder="URL изображения" />
 
           <div v-if="manualForm.type === 'film'">
             <input type="number" v-model="manualForm.duration" placeholder="Длительность (мин)" />
+            <small v-if="errors.duration" class="error">{{ errors.duration }}</small>
           </div>
           <div v-else>
             <input type="number" v-model="manualForm.totalEpisodes" placeholder="Количество серий" />
+            <small v-if="errors.totalEpisodes" class="error">{{ errors.totalEpisodes }}</small>
           </div>
+          <small v-if="successMessage" class="success">
+            {{ successMessage }}
+          </small>
 
           <div class="actions">
             <button @click="addManual" :disabled="!manualForm.title">Добавить</button>
@@ -194,6 +257,7 @@ function addManual() {
   color: #fefefe;
   border-color: #1a172c;
 }
+
 select,
 input {
   width: 100%;
@@ -260,4 +324,18 @@ input::placeholder {
   background: #fdeabf;
   border-color: #fdb688;
 }
+
+.error {
+  color: #d93025;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.success {
+  color: #1c9c3c;
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+
 </style>
