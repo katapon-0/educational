@@ -28,11 +28,10 @@ const mode = ref("login")
 
 <style scoped>
 .auth-page {
-  min-height: 100%;
+  min-height: 100vh;
   background: #fefefe;
-
   display: flex;
-  justify-content: center;
+  flex-direction: column; 
   align-items: center;
 
   padding: 20px;
