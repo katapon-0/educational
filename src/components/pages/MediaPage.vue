@@ -1,37 +1,47 @@
 <script setup>
-import { ref, computed, watch } from "vue"
-import { useRoute, useRouter } from "vue-router"
-import { useMedia } from "../../composables/useMedia"
+import { ref, computed, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useMedia } from "../../composables/useMedia";
 
-const route = useRoute()
-const router = useRouter()
+// подключаем изображения из базы и заглушки
+import defaultMedia from "../../data/defaultMedia";
+import plugFilm from "../../assets/img/plug-film.png"; // заглушка для фильма
+import plugSeries from "../../assets/img/plug-series.png"; // заглушка для сериала
+
+// Список доступных изображений для выбора
+const availableImages = [
+  { src: plugFilm, label: "Заглушка (фильм)" },
+  { src: plugSeries, label: "Заглушка (сериал)" },
+  ...defaultMedia.map((item) => ({ src: item.image, label: item.title })),
+];
+
+const route = useRoute();
+const router = useRouter();
 
 const {
   getMediaById,
   updateMedia,
   deleteMedia,
   increaseProgress,
-  updateStatus
-} = useMedia()
+  updateStatus,
+} = useMedia();
 
 // =========================
 // ТЕКУЩИЙ ОБЪЕКТ
 // =========================
-const item = computed(() =>
-  getMediaById(Number(route.params.id))
-)
+const item = computed(() => getMediaById(Number(route.params.id)));
 
 // =========================
 // РЕЖИМ РЕДАКТИРОВАНИЯ
 // =========================
-const isEditing = ref(false)
+const isEditing = ref(false);
 
 // =========================
 // СОСТОЯНИЯ UI (ошибки / успех)
 // =========================
-const errors = ref({})
-const successMessage = ref("")
-const errorMessage = ref("")
+const errors = ref({});
+const successMessage = ref("");
+const errorMessage = ref("");
 
 // =========================
 // ФОРМА РЕДАКТИРОВАНИЯ
@@ -42,81 +52,105 @@ const form = ref({
   progress: 0,
   totalEpisodes: 0,
   episodeDuration: 0,
-  image: ""
-})
+  image: "",
+  description: "",
+  link: "",
+});
+
+// кастомный селект для изображений
+const showImageSelect = ref(false);
+const imageSelectRef = ref(null);
+function toggleImageSelect() {
+  showImageSelect.value = !showImageSelect.value;
+}
+function selectImage(imgSrc) {
+  form.value.image = imgSrc;
+  showImageSelect.value = false;
+}
+function closeImageSelect(e) {
+  if (imageSelectRef.value && !imageSelectRef.value.contains(e.target)) {
+    showImageSelect.value = false;
+  }
+}
 
 // =========================
 // СИНХРОНИЗАЦИЯ ДАННЫХ → ФОРМА
 // =========================
-watch(item, (val) => {
-  if (!val) return
+watch(
+  item,
+  (val) => {
+    if (!val) return;
 
-  form.value = {
-    title: val.title,
-    type: val.type,
-    progress: val.progress || 0,
-    totalEpisodes: val.totalEpisodes || 0,
-    episodeDuration: val.episodeDuration || 0,
-    image: val.image || ""
-  }
-}, { immediate: true })
+    form.value = {
+      title: val.title,
+      type: val.type,
+      progress: val.progress || 0,
+      totalEpisodes: val.totalEpisodes || 0,
+      episodeDuration: val.episodeDuration || 0,
+      image: val.image || "",
+      description: val.description || "",
+      link: val.link || "",
+    };
+  },
+  { immediate: true },
+);
 
 // =========================
 // ВАЛИДАЦИЯ ФОРМЫ
 // =========================
 function validate() {
-  errors.value = {}
-  successMessage.value = ""
-  errorMessage.value = ""
+  errors.value = {};
+  successMessage.value = "";
+  errorMessage.value = "";
 
   if (!form.value.title.trim()) {
-    errors.value.title = "Название не может быть пустым"
+    errors.value.title = "Название не может быть пустым";
   }
 
   if (!form.value.type) {
-    errors.value.type = "Выберите тип"
+    errors.value.type = "Выберите тип";
   }
 
   if (form.value.type === "series") {
     if (form.value.totalEpisodes < 1) {
-      errors.value.totalEpisodes = "Должно быть хотя бы 1 серия"
+      errors.value.totalEpisodes = "Должно быть хотя бы 1 серия";
     }
 
     if (form.value.progress < 0) {
-      errors.value.progress = "Прогресс не может быть отрицательным"
+      errors.value.progress = "Прогресс не может быть отрицательным";
     }
 
     if (form.value.progress > form.value.totalEpisodes) {
-      errors.value.progress = "Прогресс не может превышать общее количество"
+      errors.value.progress = "Прогресс не может превышать общее количество";
     }
   }
 
-  return Object.keys(errors.value).length === 0
+  return Object.keys(errors.value).length === 0;
 }
 
 // =========================
 // UI ACTIONS
 // =========================
 function startEdit() {
-  isEditing.value = true
+  isEditing.value = true;
 }
 
 function cancelEdit() {
-  isEditing.value = false
-  errors.value = {}
-  successMessage.value = ""
-  errorMessage.value = ""
+  isEditing.value = false;
+  errors.value = {};
+  successMessage.value = "";
+  errorMessage.value = "";
 }
 
 // =========================
 // СОХРАНЕНИЕ
 // =========================
 function save() {
-  if (!item.value) return
+  if (!item.value) return;
 
   if (!validate()) {
-    errorMessage.value = "Проверьте корректность введённых данных"
-    return
+    errorMessage.value = "Проверьте корректность введённых данных";
+    return;
   }
 
   try {
@@ -126,13 +160,15 @@ function save() {
       progress: form.value.progress,
       totalEpisodes: form.value.totalEpisodes,
       episodeDuration: form.value.episodeDuration,
-      image: form.value.image
-    })
+      image: form.value.image,
+      description: form.value.description,
+      link: form.value.link,
+    });
 
-    successMessage.value = "Изменения сохранены"
-    isEditing.value = false
+    successMessage.value = "Изменения сохранены";
+    isEditing.value = false;
   } catch (e) {
-    errorMessage.value = "Ошибка при сохранении"
+    errorMessage.value = "Ошибка при сохранении";
   }
 }
 
@@ -140,29 +176,29 @@ function save() {
 // ПРОГРЕСС
 // =========================
 function handleIncreaseProgress() {
-  if (!item.value) return
-  if (item.value.type !== "series") return
+  if (!item.value) return;
+  if (item.value.type !== "series") return;
 
-  increaseProgress(item.value.id)
+  increaseProgress(item.value.id);
 
-  const updatedItem = getMediaById(item.value.id)
+  const updatedItem = getMediaById(item.value.id);
 
   if (updatedItem?.progress >= updatedItem?.totalEpisodes) {
-    router.push("/")
+    router.push("/");
   }
 }
 
 function handleDecreaseProgress() {
-  if (!item.value) return
-  if (item.value.type !== "series") return
+  if (!item.value) return;
+  if (item.value.type !== "series") return;
 
-  let newProgress = (item.value.progress || 0) - 1
-  if (newProgress < 0) newProgress = 0
+  let newProgress = (item.value.progress || 0) - 1;
+  if (newProgress < 0) newProgress = 0;
 
-  updateMedia(item.value.id, { progress: newProgress })
+  updateMedia(item.value.id, { progress: newProgress });
 
   if (newProgress === 0) {
-    updateStatus(item.value.id, "want")
+    updateStatus(item.value.id, "want");
   }
 }
 
@@ -170,39 +206,35 @@ function handleDecreaseProgress() {
 // УДАЛЕНИЕ
 // =========================
 function remove() {
-  if (!item.value) return
-  deleteMedia(item.value.id)
-  router.push("/")
+  if (!item.value) return;
+  deleteMedia(item.value.id);
+  router.push("/");
 }
 
 // =========================
 // НАВИГАЦИЯ
 // =========================
 function goBack() {
-  router.back()
+  router.back();
 }
 
 function markAsWatched() {
-  if (!item.value) return
-  updateMedia(item.value.id, { status: "done" })
-  router.push("/")
+  if (!item.value) return;
+  updateMedia(item.value.id, { status: "done" });
+  router.push("/");
 }
 </script>
 
 <template>
   <div class="page" v-if="item">
-
-    <button class="btn-back" @click="goBack">
-      ← назад
-    </button>
+    <button class="btn-back" @click="goBack">← назад</button>
 
     <div v-if="!isEditing" class="card view-card">
-
       <div class="header">
         <h1 class="title">{{ item.title }}</h1>
 
         <span class="type">
-          {{ item.type === 'series' ? 'Сериал' : 'Фильм' }}
+          {{ item.type === "series" ? "Сериал" : "Фильм" }}
         </span>
       </div>
 
@@ -211,44 +243,46 @@ function markAsWatched() {
 
         <div class="info">
           <p class="description">
-            {{ item.description || 'Описание отсутствует' }}
+            {{ item.description || "Описание отсутствует" }}
           </p>
 
           <div class="meta">
             <span v-if="item.type === 'series'">
-              {{ item.progress || 0 }} / {{ item.totalEpisodes ?? '?' }} серий
+              {{ item.progress || 0 }} / {{ item.totalEpisodes ?? "?" }} серий
             </span>
 
             <span v-else>
-              {{ item.episodeDuration || item.duration || '?' }} мин
+              {{ item.episodeDuration || item.duration || "?" }} мин
             </span>
           </div>
+          <!-- кнопка "Смотреть онлайн" -->
+          <a
+            v-if="item.link"
+            :href="item.link"
+            target="_blank"
+            class="btn accent watch-btn"
+            >Смотреть онлайн</a
+          >
         </div>
       </div>
       <div class="actions">
-
         <div v-if="item.type === 'series'" class="progress-actions">
           <button class="btn round" @click="handleDecreaseProgress">−</button>
-          <button class="btn round accent" @click="handleIncreaseProgress">+</button>
+          <button class="btn round accent" @click="handleIncreaseProgress">
+            +
+          </button>
         </div>
 
         <button v-else class="btn accent" @click="markAsWatched">
           ✔ Просмотрено
         </button>
 
-        <button class="btn dark" @click="startEdit">
-          Редактировать
-        </button>
+        <button class="btn dark" @click="startEdit">Редактировать</button>
 
-        <button class="btn danger" @click="remove">
-          Удалить
-        </button>
-
+        <button class="btn danger" @click="remove">Удалить</button>
       </div>
-
     </div>
     <div v-else class="card edit-card">
-
       <h2 class="title">Редактирование</h2>
       <p v-if="errorMessage" class="error-global">
         {{ errorMessage }}
@@ -272,69 +306,85 @@ function markAsWatched() {
           </select>
           <small v-if="errors.type" class="error">{{ errors.type }}</small>
         </div>
-        <div class="field">
-          <label>Обложка (URL)</label>
-          <input v-model="form.image" placeholder="https://..." />
-        </div>
-        <template v-if="form.type === 'series'">
 
+        <!-- выбор изображения из списка -->
+        <div class="field">
+          <label>Обложка</label>
+          <div
+            class="custom-select"
+            @click="toggleImageSelect"
+            ref="imageSelectRef"
+          >
+            <div class="custom-select__trigger">
+              <span>{{ form.image ? "Выбрано" : "Выберите изображение" }}</span>
+              <span class="custom-select__arrow">▼</span>
+            </div>
+            <div v-if="showImageSelect" class="custom-select__options">
+              <div
+                v-for="img in availableImages"
+                :key="img.src"
+                class="custom-select__option"
+                @click.stop="selectImage(img.src)"
+              >
+                <img :src="img.src" class="option-img" />
+                <span>{{ img.label }}</span>
+              </div>
+            </div>
+          </div>
+          <img v-if="form.image" :src="form.image" class="image-preview" />
+        </div>
+
+        <!-- описание -->
+        <div class="field">
+          <label>Описание</label>
+          <textarea
+            v-model="form.description"
+            placeholder="Описание фильма/сериала"
+            rows="3"
+          ></textarea>
+        </div>
+
+        <!-- ссылка для просмотра -->
+        <div class="field">
+          <label>Ссылка для просмотра</label>
+          <input v-model="form.link" placeholder="https://..." />
+        </div>
+
+        <template v-if="form.type === 'series'">
           <div class="field">
             <label>Прогресс</label>
             <input
               v-model.number="form.progress"
               type="number"
-              placeholder="0"
+              :max="form.totalEpisodes"
             />
-            <small v-if="errors.progress" class="error">
-              {{ errors.progress }}
-            </small>
+            <small v-if="errors.progress" class="error">{{
+              errors.progress
+            }}</small>
           </div>
-
           <div class="field">
             <label>Всего серий</label>
-            <input
-              v-model.number="form.totalEpisodes"
-              type="number"
-              placeholder="12"
-            />
-            <small v-if="errors.totalEpisodes" class="error">
-              {{ errors.totalEpisodes }}
-            </small>
+            <input v-model.number="form.totalEpisodes" type="number" />
+            <small v-if="errors.totalEpisodes" class="error">{{
+              errors.totalEpisodes
+            }}</small>
           </div>
-
         </template>
         <template v-else>
-
           <div class="field">
             <label>Длительность (мин)</label>
-            <input
-              v-model.number="form.episodeDuration"
-              type="number"
-              placeholder="120"
-            />
+            <input v-model.number="form.episodeDuration" type="number" />
           </div>
-
         </template>
-
       </div>
+
       <div class="actions">
-
-        <button class="btn accent" @click="save">
-          Сохранить
-        </button>
-
-        <button class="btn dark" @click="cancelEdit">
-          Отмена
-        </button>
-
+        <button class="btn accent" @click="save">Сохранить</button>
+        <button class="btn dark" @click="cancelEdit">Отмена</button>
       </div>
-
     </div>
-
   </div>
-  <div v-else class="empty">
-    <p>Медиа не найдено</p>
-  </div>
+  <div v-else class="empty"><p>Медиа не найдено</p></div>
 </template>
 
 <style scoped>
@@ -551,7 +601,6 @@ function markAsWatched() {
   gap: 16px;
 }
 
-
 .field {
   display: flex;
   flex-direction: column;
@@ -560,7 +609,6 @@ function markAsWatched() {
   width: 100%;
   max-width: 100%;
 }
-
 
 label {
   font-size: 14px;
@@ -572,14 +620,14 @@ select {
   width: 100%;
   box-sizing: border-box;
 
-  padding: 12px 12px; 
+  padding: 12px 12px;
   border: 1px solid #e5e5e5;
   border-radius: 10px;
 
   background: #fefefe;
   color: #1a172c;
 
-  font-size: 15px; 
+  font-size: 15px;
 
   transition: all 0.2s ease;
 
@@ -604,7 +652,7 @@ input::placeholder {
 
 .error-global,
 .success {
-  font-size: 14px; 
+  font-size: 14px;
   padding: 10px 12px;
   border-radius: 10px;
 }
@@ -628,4 +676,85 @@ input,
 select {
   max-width: 100%;
 }
+
+.custom-select {
+  position: relative;
+  width: 100%;
+  background: #fefefe;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.custom-select__trigger {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  font-size: 14px;
+}
+
+.custom-select__arrow {
+  font-size: 10px;
+  color: #999;
+}
+
+.custom-select__options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  z-index: 10;
+  margin-top: 4px;
+}
+
+.custom-select__option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  transition: 0.2s;
+}
+
+.custom-select__option:hover {
+  background: #fdeabf;
+}
+
+.option-img {
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.image-preview {
+  margin-top: 8px;
+  width: 100px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #e5e5e5;
+}
+
+.watch-btn {
+  display: inline-block;
+  text-decoration: none;
+  color: white;
+  background: #1a172c;
+  padding: 8px 18px;
+  border-radius: 40px;
+  margin-top: 12px;
+  width: 150px;
+}
+
+.watch-btn:hover {
+  background: #2d2a44;
+}
+
 </style>

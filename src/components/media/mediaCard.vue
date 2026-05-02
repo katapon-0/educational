@@ -20,14 +20,6 @@ const isSeries = computed(() => props.item.type === "series")
 
 const statusLabel = computed(() => statusLabels[props.item.status] ?? props.item.status)
 
-const formattedWatchDate = computed(() => {
-  if (!props.item.watchDate) return ""
-
-  const date = new Date(props.item.watchDate)
-  if (Number.isNaN(date.getTime())) return ""
-
-  return date.toLocaleDateString("ru-RU")
-})
 
 const formattedDuration = computed(() => {
   return props.item.duration ?? "?" //если есть длительность показываем, иначе ?
@@ -99,6 +91,7 @@ function decProgress() {
   }
 }
 
+// обработчик смены даты из кастомного селекта
 function onWatchDateChange(event) {
   const date = event.target.value || null
   setWatchDate(props.item.id, date)
@@ -129,20 +122,32 @@ const progressPercent = computed(() => {
 
       <p class="status">{{ statusLabel }}</p>
 
-      <p v-if="isOverdue" class="badge overdue-badge">⚠ Просрочено</p>
-
-      <p v-if="item.watchDate" class="meta">
-        📅 Смотреть до: {{ formattedWatchDate }}
-      </p>
+      <p v-if="isOverdue" class="badge overdue-badge"> Просрочено</p>
 
       <p v-if="item.dateAdded" class="meta">
         ➕ Добавлено: {{ formattedDateAdded }}
       </p>
 
+      <!-- кастомный селект даты просмотра (как фильтры) -->
       <div v-if="item.status !== 'done'" class="date-picker">
         <label class="meta">Назначить дату просмотра:</label>
 
-        <input type="date" :value="item.watchDate ?? ''" @change="onWatchDateChange" />
+        <div class="custom-date-select">
+          <img src="../../assets/icons/calendar.png" class="calendar-icon" />
+          <span class="selected-date">
+            {{ item.watchDate ? new Date(item.watchDate).toLocaleDateString("ru-RU") : "Не выбрана" }}
+          </span>
+          <span class="custom-select__arrow">▼</span>
+
+          <!-- скрытый нативный input, перекрывает всю обёртку и открывает календарь -->
+          <input
+            type="date"
+            :value="item.watchDate ?? ''"
+            @change="onWatchDateChange"
+            class="hidden-date-input"
+            tabindex="-1"
+          />
+        </div>
       </div>
 
       <div v-if="isSeries" class="progress">
@@ -221,8 +226,8 @@ const progressPercent = computed(() => {
 }
 
 .cover {
-  width: 250px;
-  height: 350px;
+  width: 280px;
+  height: 400px;
   object-fit: cover;
   border-radius: 10px;
   flex-shrink: 0;
@@ -237,6 +242,7 @@ const progressPercent = computed(() => {
   text-align: center;
   gap: 18px;
   min-width: 0;
+  padding: 15px;
 }
 
 .title {
@@ -262,6 +268,69 @@ const progressPercent = computed(() => {
   background: #fdeabf;
   color: #1a172c;
   font-weight: 600;
+}
+
+/* стилизация кастомного селекта даты */
+.date-picker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin: 8px 0;
+}
+
+.date-picker .meta {
+  font-size: 14px;
+  color: #666;
+}
+
+.custom-date-select {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  background: #fefefe;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  position: relative;
+  width: 220px;
+  justify-content: space-between;
+}
+
+.custom-date-select:hover {
+  border-color: #fdb688;
+}
+
+.calendar-icon {
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
+}
+
+.selected-date {
+  flex: 1;
+  font-size: 14px;
+  color: #1a172c;
+  text-align: left;
+}
+
+.custom-select__arrow {
+  font-size: 10px;
+  color: #999;
+}
+
+/* скрытый нативный инпут, перекрывает всю обёртку, открывает календарь */
+.hidden-date-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 1;
 }
 
 .progress {
@@ -347,5 +416,4 @@ const progressPercent = computed(() => {
   color: #c36b65;
   font-weight: 600;
 }
-
 </style>
