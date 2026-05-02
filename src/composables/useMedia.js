@@ -74,7 +74,7 @@ const statuses = ["want", "watching", "done", "abandoned"]
 const statusLabels = {
     want: "Хочу посмотреть",
     watching: "Смотрю",
-    done: "Посмотрено",
+    done: "Просмотрено",
     abandoned: "Заброшено"
 }
 
