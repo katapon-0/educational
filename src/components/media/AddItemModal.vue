@@ -2,6 +2,14 @@
 import { ref } from "vue"
 import { useUsers } from "../../composables/useUsers"
 import defaultMedia from "../../data/defaultMedia"
+import plugFilm from "../../assets/img/plug-film.png"
+import plugSeries from "../../assets/img/plug-series.png"
+
+const availableImages = [
+  { src: plugFilm, label: "Заглушка (фильм)" },
+  { src: plugSeries, label: "Заглушка (сериал)" },
+  ...defaultMedia.map(item => ({ src: item.image, label: item.title }))
+]
 
 const emit = defineEmits(["close"])
 const { addMediaToUser } = useUsers()
@@ -19,8 +27,14 @@ const manualForm = ref({
   link: "",
   duration: null,
   totalEpisodes: null,
-  image: ""
+  image: plugFilm,   // значение по умолчанию
+  description: ""
 })
+
+const showImageSelect = ref(false)
+const imageSelectRef = ref(null)
+function toggleImageSelect() { showImageSelect.value = !showImageSelect.value }
+function selectImage(imgSrc) { manualForm.value.image = imgSrc; showImageSelect.value = false }
 
 // =========================
 // ДОБАВЛЕНИЕ ИЗ БАЗЫ/ теперь через find
@@ -174,7 +188,22 @@ function validateManual() {
           <small v-if="errors.type" class="error">{{ errors.type }}</small>
           <input type="date" v-model="manualForm.watchDate" placeholder="Дата просмотра" />
           <input v-model="manualForm.link" placeholder="Ссылка" />
-          <input v-model="manualForm.image" placeholder="URL изображения" />
+          <input v-model="manualForm.description" placeholder="Описание" />
+
+          <!-- выбор обложки -->
+          <div class="custom-select" @click="toggleImageSelect" ref="imageSelectRef">
+            <div class="custom-select__trigger">
+              <span>{{ manualForm.image ? 'Выбрано' : 'Выберите обложку' }}</span>
+              <span class="custom-select__arrow">▼</span>
+            </div>
+            <div v-if="showImageSelect" class="custom-select__options">
+              <div v-for="img in availableImages" :key="img.src" class="custom-select__option" @click.stop="selectImage(img.src)">
+                <img :src="img.src" class="option-img" />
+                <span>{{ img.label }}</span>
+              </div>
+            </div>
+          </div>
+          <img v-if="manualForm.image" :src="manualForm.image" class="image-preview" />
 
           <div v-if="manualForm.type === 'film'">
             <input type="number" v-model="manualForm.duration" placeholder="Длительность (мин)" />
@@ -337,5 +366,71 @@ input::placeholder {
   margin-top: 10px;
 }
 
+.custom-select {
+  position: relative;
+  width: 100%;
+  background: #fefefe;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+}
+.custom-select__trigger {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  font-size: 14px;
+}
+.custom-select__arrow {
+  font-size: 10px;
+  color: #999;
+}
+.custom-select__options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  z-index: 10;
+  margin-top: 4px;
+}
+.custom-select__option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+}
+.custom-select__option:hover {
+  background: #fdeabf;
+}
+.option-img {
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+.image-preview {
+  margin-top: 8px;
+  width: 100px;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #e5e5e5;
+}
+.watch-btn {
+  display: inline-block;
+  text-decoration: none;
+  color: white;
+  background: #1a172c;
+  padding: 8px 18px;
+  border-radius: 40px;
+  margin-top: 12px;
+}
+.watch-btn:hover {
+  background: #2d2a44;
+}
 
 </style>

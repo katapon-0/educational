@@ -100,7 +100,7 @@ function handleDelete(id) {
             <strong>{{ suggestion.title }}</strong>
             <span>({{ suggestion.type === "series" ? "Сериал" : "Фильм" }})</span>
             <span v-if="suggestion.watchDate">
-              📅 {{ new Date(suggestion.watchDate).toLocaleDateString() }}
+              {{ new Date(suggestion.watchDate).toLocaleDateString() }}
             </span>
             <button @click="router.push('/media/' + suggestion.id)" class="btn-link">
               Перейти

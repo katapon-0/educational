@@ -1,77 +1,142 @@
 <script setup>
-import { computed, ref } from "vue"
-import MediaCard from "./MediaCard.vue"
-import { useMedia } from "../../composables/useMedia"
+import { computed, ref } from "vue";
+import MediaCard from "./MediaCard.vue";
+import { useMedia } from "../../composables/useMedia";
+
+import iconCalendar from "../../assets/icons/icon-calendar.png";
+import iconWarning from "../../assets/icons/icon-warning.png";
 
 // ПРИНИМАЕМ СПИСОК ОТ РОДИТЕЛЯ
 const props = defineProps({
   items: {
     type: Array,
-    default: () => []
-  }
-})
-const emit = defineEmits(["delete"])
+    default: () => [],
+  },
+});
+const emit = defineEmits(["delete"]);
 
-const { filterByType, filterByStatus, sortByDate, getOverdue, statuses, statusLabels } = useMedia()
+const {
+  filterByType,
+  filterByStatus,
+  sortByDate,
+  getOverdue,
+  statuses,
+  statusLabels,
+} = useMedia();
 
-const filter = ref("all")
-const typeFilter = ref("all")
-const statusFilter = ref("all")
-const sortType = ref("date-asc")
+const typeFilter = ref("all");
+const statusFilter = ref("all");
+const sortType = ref("date-asc");
+
+// кастомный селект сортировки
+const showSortDropdown = ref(false);
+const sortSelectRef = ref(null);
+function toggleSortDropdown() {
+  showSortDropdown.value = !showSortDropdown.value;
+}
+function selectSort(value) {
+  sortType.value = value;
+  showSortDropdown.value = false;
+}
 
 const filteredMedia = computed(() => {
-  let list = props.items
+  let list = props.items;
+  list = filterByType(list, typeFilter.value);
+  list = filterByStatus(list, statusFilter.value);
 
-  // старый фильтр
-  if (filter.value === "series") {
-    list = list.filter(m => m.type === "series")
-  } else if (filter.value === "film") {
-    list = list.filter(m => m.type === "film")
-  }
+  if (sortType.value === "date-asc") list = sortByDate(list, "asc");
+  else if (sortType.value === "date-desc") list = sortByDate(list, "desc");
+  else if (sortType.value === "overdue") list = getOverdue(list);
 
-  // новые фильтры
-  list = filterByType(list, typeFilter.value)
-  list = filterByStatus(list, statusFilter.value)
-
-  // сортировка / режим
-  if (sortType.value === "date-asc") {
-    list = sortByDate(list, "asc")
-  } else if (sortType.value === "date-desc") {
-    list = sortByDate(list, "desc")
-  } else if (sortType.value === "overdue") {
-    list = getOverdue(list)
-  }
-
-  return list
-})
-
+  return list;
+});
 </script>
 
 <template>
   <div class="list">
     <div class="filters">
-      <button @click="filter = 'all'" :class="{ active: filter === 'all' }">Все</button>
-      <button @click="filter = 'series'" :class="{ active: filter === 'series' }">Сериалы</button>
-      <button @click="filter = 'film'" :class="{ active: filter === 'film' }">Фильмы</button>
+      <button
+        @click="typeFilter = 'all'"
+        :class="{ active: typeFilter === 'all' }"
+      >
+        Все
+      </button>
+      <button
+        @click="typeFilter = 'series'"
+        :class="{ active: typeFilter === 'series' }"
+      >
+        Сериалы
+      </button>
+      <button
+        @click="typeFilter = 'film'"
+        :class="{ active: typeFilter === 'film' }"
+      >
+        Фильмы
+      </button>
 
       <span class="separator"></span>
 
-      <button @click="statusFilter = 'all'" :class="{ active: statusFilter === 'all' }">Все статусы</button>
-      <button v-for="st in statuses" :key="st" @click="statusFilter = st" :class="{ active: statusFilter === st }">
+      <button
+        @click="statusFilter = 'all'"
+        :class="{ active: statusFilter === 'all' }"
+      >
+        Все статусы
+      </button>
+      <button
+        v-for="st in statuses"
+        :key="st"
+        @click="statusFilter = st"
+        :class="{ active: statusFilter === st }"
+      >
         {{ statusLabels[st] }}
       </button>
 
       <span class="separator"></span>
 
-      <select v-model="sortType" class="sort-select">
-        <option value="date-asc">📅 Ближайшие</option>
-        <option value="date-desc">📅 Поздние</option>
-        <option value="overdue">⚠️ Просроченные</option>
-      </select>
+      <!-- кастомный селект сортировки -->
+      <div
+        class="custom-select"
+        @click="toggleSortDropdown"
+        ref="sortSelectRef"
+      >
+        <div class="custom-select__trigger">
+          <span>
+            <img
+              :src="sortType === 'overdue' ? iconWarning : iconCalendar"
+              class="sort-icon"
+              alt="sort"
+            />
+            {{
+              sortType === "date-asc"
+                ? "Ближайшие"
+                : sortType === "date-desc"
+                  ? "Поздние"
+                  : "Просроченные"
+            }}
+          </span>
+          <span class="custom-select__arrow">▼</span>
+        </div>
+        <div v-if="showSortDropdown" class="custom-select__options">
+          <div class="custom-select__option" @click="selectSort('date-asc')">
+            <img :src="iconCalendar" class="sort-icon" alt="calendar" /> Ближайшие
+          </div>
+          <div class="custom-select__option" @click="selectSort('date-desc')">
+            <img :src="iconCalendar" class="sort-icon" alt="calendar" /> Поздние
+          </div>
+          <div class="custom-select__option" @click="selectSort('overdue')">
+            <img :src="iconWarning" class="sort-icon" alt="warning" /> Просроченные
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="grid">
-      <MediaCard v-for="item in filteredMedia" :key="item.id" :item="item" @delete="emit('delete', item.id)" />
+      <MediaCard
+        v-for="item in filteredMedia"
+        :key="item.id"
+        :item="item"
+        @delete="emit('delete', item.id)"
+      />
     </div>
   </div>
 </template>
@@ -121,6 +186,13 @@ const filteredMedia = computed(() => {
   margin: 0 4px;
 }
 
+.sort-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
 .sort-select {
   padding: 6px 12px;
 
@@ -149,5 +221,47 @@ const filteredMedia = computed(() => {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.custom-select {
+  position: relative;
+  width: 220px;
+  background: #fefefe;
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 14px;
+  color: #1a172c;
+  transition: border-color 0.2s;
+}
+.custom-select__trigger {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 14px;
+}
+.custom-select__arrow {
+  font-size: 10px;
+  color: #999;
+}
+.custom-select__options {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(26, 23, 44, 0.12);
+  z-index: 10;
+  overflow: hidden;
+}
+.custom-select__option {
+  padding: 10px 14px;
+  transition: 0.2s;
+}
+.custom-select__option:hover {
+  background: #fdeabf;
 }
 </style>
