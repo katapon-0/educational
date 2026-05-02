@@ -31,12 +31,27 @@ function handleDelete(id) {
 
 <template>
   <div class="home">
-    <div v-if="!currentUser">
-      <h2>Вы не авторизованы</h2>
-      <p>Пожалуйста, войдите в систему</p>
-      <button @click="router.push({ name: 'login' })" class="btn-primary">
-        Перейти к входу
-      </button>
+    <div v-if="!currentUser" class="guest">
+      <div class="guest-card">
+
+        <img src="../../assets/icons/suggetion.png" class="guest-illustration" />
+
+        <h1 class="guest-title">
+          Ваш личный список просмотра
+        </h1>
+
+        <p class="guest-subtitle">
+          Сохраняйте фильмы и сериалы, отслеживайте прогресс и не забывайте,
+          что хотели посмотреть
+        </p>
+
+        <div class="guest-actions">
+          <button @click="router.push({ name: 'login' })" class="guest-btn">
+            Авторизоваться
+          </button>
+        </div>
+
+      </div>
     </div>
 
 
@@ -309,5 +324,76 @@ function handleDelete(id) {
 .empty-suggestion {
   margin-top: 10px;
   color: #b24a4a;
+}
+
+.guest {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+}
+
+.guest-card {
+  max-width: 520px;
+  width: 100%;
+  text-align: center;
+
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 24px;
+  padding: 32px;
+
+  box-shadow: 0 10px 30px rgba(26, 23, 44, 0.08);
+}
+
+.guest-illustration {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 16px;
+  opacity: 0.9;
+}
+
+.guest-title {
+  font-size: 28px;
+  margin-bottom: 10px;
+  color: #1a172c;
+}
+
+.guest-subtitle {
+  font-size: 17px;
+  opacity: 0.7;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.guest-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.guest-btn {
+  width: 100%;
+  max-width: 220px;
+  padding: 12px 16px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: #1a172c;
+  color: #fefefe;
+
+  font-size: 15px;
+  font-weight: 500;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  box-shadow: 0 4px 12px rgba(26, 23, 44, 0.2);
+}
+
+.guest-btn:hover {
+  background: #2d2a44;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(26, 23, 44, 0.3);
 }
 </style>
