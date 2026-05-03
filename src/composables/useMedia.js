@@ -114,10 +114,12 @@ function increaseProgress(id) {
 // =========================
 // CОРТИРОВКА
 // =========================
+const MAX_DATE = new Date("2100-01-01")
+
 function sortByDate(list, order = "desc") {
     return [...list].sort((a, b) => {
-        const dateA = a.watchDate ? new Date(a.watchDate) : new Date(8640000000000000)
-        const dateB = b.watchDate ? new Date(b.watchDate) : new Date(8640000000000000)
+        const dateA = a.watchDate ? new Date(a.watchDate) : MAX_DATE
+        const dateB = b.watchDate ? new Date(b.watchDate) : MAX_DATE
 
         return order === "asc"
             ? dateA - dateB
@@ -144,11 +146,11 @@ function getOverdue(list) {
 // СТАТА
 // =========================
 function getStats(list) {
-    return list.reduce(
-        (acc, m) => {
-            acc[m.status] = (acc[m.status] || 0) + 1
-            acc.total++
-            return acc
+    return list.reduce( //превращаем массив в одно значение
+        (acc, m) => { //acc - сюда мы накапливаем значения, m - текущий элемент массива
+            acc[m.status] = (acc[m.status] || 0) + 1 //статус - если значения нет, то 0 и увеличиваем счётчик на единицу
+            acc.total++ //общее кол-во элементов
+            return acc //незн че он возвращает но без него всё падает
         },
         { want: 0, watching: 0, done: 0, abandoned: 0, total: 0 }
     )

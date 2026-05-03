@@ -1,8 +1,12 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 
-// https://vite.dev/config/
-export default defineConfig({
-  plugins: [vue()],
-  // base: "/educational/",
+// чтобы каждый раз не переключать createwebhistory (для просмотра на локалхост) на createwebhashhistory (для использования на gh-pages)
+export default defineConfig(({ mode }) => {
+  const isProd = mode === 'production' //даёт true при выполнении npm run build
+
+  return {
+    plugins: [vue()],
+    base: isProd ? "/educational/" : "/",
+  }
 })

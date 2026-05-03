@@ -44,7 +44,7 @@ const canIncreaseProgress = computed(() => {
 //просрочено ли?
 const isOverdue = computed(() => {
   if (!props.item.watchDate) return false //если нет даиы просмотра-> не просрочено 
-  if (props.item.status === "done") return false //если отмечено как просмотрено, -> просрочено 
+  if (props.item.status === "done" || props.item.status === "abandoned") return false //если отмечено как просмотрено или заброшено, -> не просрочено 
 
   const today = new Date() //берем сегодняшнюю дату
   today.setHours(0, 0, 0, 0) //обнуляем время
@@ -119,7 +119,7 @@ function openDatePicker() { // https://developer.mozilla.org/en-US/docs/Web/API/
   //если простыми словами,шоупикер это команда "открой это"
   if (dateInput.value.showPicker) { //если шоу пикер поддерживается в браузере
     dateInput.value.showPicker() //нажать
-  } else {  
+  } else {
     dateInput.value.focus() //навести на календарь
     dateInput.value.click() //кликнуть
   }
@@ -139,14 +139,12 @@ function openDatePicker() { // https://developer.mozilla.org/en-US/docs/Web/API/
 
       <p class="status">{{ statusLabel }}</p>
 
-      <p v-if="isOverdue" class="badge overdue-badge"> Просрочено</p>
-
       <p v-if="item.dateAdded" class="meta">
         ➕ Добавлено: {{ formattedDateAdded }}
       </p>
 
       <!-- кастомный селект даты просмотра (как фильтры) -->
-      <div v-if="item.status !== 'done'" class="date-picker">
+      <div v-if="item.status !== 'done' && item.status !== 'abandoned'" class="date-picker">
         <label class="meta">Назначить дату просмотра:</label>
 
         <div class="custom-date-select" @click="openDatePicker">
@@ -160,6 +158,7 @@ function openDatePicker() { // https://developer.mozilla.org/en-US/docs/Web/API/
           <input ref="dateInput" type="date" :value="item.watchDate ?? ''" @change="onWatchDateChange"
             class="hidden-date-input" />
         </div>
+        <p v-if="isOverdue" class="badge overdue-badge">Просрочено :-( </p>
       </div>
 
       <div v-if="isSeries" class="progress">
@@ -282,7 +281,6 @@ function openDatePicker() { // https://developer.mozilla.org/en-US/docs/Web/API/
   font-weight: 600;
 }
 
-/* стилизация кастомного селекта даты */
 .date-picker {
   display: flex;
   flex-direction: column;
@@ -345,7 +343,6 @@ function openDatePicker() { // https://developer.mozilla.org/en-US/docs/Web/API/
   z-index: 10;
   pointer-events: none;
 }
-
 
 .progress {
   display: flex;
@@ -426,8 +423,9 @@ function openDatePicker() { // https://developer.mozilla.org/en-US/docs/Web/API/
   cursor: not-allowed;
 }
 
-.overdue-text {
+.overdue-badge {
   color: #c36b65;
   font-weight: 600;
 }
+
 </style>

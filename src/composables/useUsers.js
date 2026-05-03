@@ -158,13 +158,11 @@ function updateUserMedia(mediaList) {
 
 function addMediaToUser(item) {
     if (!currentUser.value) {
-        console.error("Нет текущего пользователя")
         return
     }
 
     const media = currentUser.value.media
     if (!Array.isArray(media)) {
-        console.error("media не массив", media)
         return
     }
 
@@ -177,7 +175,7 @@ function addMediaToUser(item) {
         type: item.type || "film",
         description: item.description || "",
         status: item.status || "want",
-        watchDate: item.watchDate || null,    // исправлено
+        watchDate: item.watchDate || null,  
         link: item.link || null,
         episodeDuration: item.episodeDuration || null,
         totalEpisodes: item.totalEpisodes || null,
@@ -185,9 +183,6 @@ function addMediaToUser(item) {
         progress: 0,
         image: item.image || null
     }
-
-    // console.log("Добавляем:", newItem)
-
     // создаём новый массив, чтобы реактивность сработала
     const newMedia = [...media, newItem]
     updateUserMedia(newMedia)

@@ -41,7 +41,7 @@ function submit() {
     return
   }
 
-  router.push("/")
+  router.push({ name: "home" });
 }
 </script>
 
