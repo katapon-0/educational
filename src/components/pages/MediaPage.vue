@@ -55,6 +55,7 @@ const form = ref({
   image: "",
   description: "",
   link: "",
+  status: "",
 });
 
 // кастомный селект для изображений
@@ -96,6 +97,7 @@ watch(
       image: val.image || "",
       description: val.description || "",
       link: val.link || "",
+      status: val.status || "want",
     };
   },
   { immediate: true },
@@ -119,7 +121,7 @@ function validate() {
 
   if (form.value.type === "series") {
     if (form.value.totalEpisodes < 1) {
-      errors.value.totalEpisodes = "Должно быть хотя бы 1 серия";
+      errors.value.totalEpisodes = "Должна быть хотя бы 1 серия";
     }
 
     if (form.value.progress < 0) {
@@ -169,6 +171,7 @@ function save() {
       image: form.value.image,
       description: form.value.description,
       link: form.value.link,
+      status: form.value.status,
     });
 
     successMessage.value = "Изменения сохранены";
@@ -189,9 +192,9 @@ function handleIncreaseProgress() {
 
   const updatedItem = getMediaById(item.value.id);
 
-  if (updatedItem?.progress >= updatedItem?.totalEpisodes) {
-    router.push("/");
-  }
+  // if (updatedItem?.progress >= updatedItem?.totalEpisodes) {
+  //   router.push({ name: "home" });
+  // }
 }
 
 function handleDecreaseProgress() {
@@ -214,7 +217,7 @@ function handleDecreaseProgress() {
 function remove() {
   if (!item.value) return;
   deleteMedia(item.value.id);
-  router.push("/");
+  router.push({ name: "home" });
 }
 
 // =========================
@@ -227,7 +230,7 @@ function goBack() {
 function markAsWatched() {
   if (!item.value) return;
   updateMedia(item.value.id, { status: "done" });
-  router.push("/");
+  // router.push({ name: "home" });
 }
 </script>
 
@@ -239,9 +242,18 @@ function markAsWatched() {
       <div class="header">
         <h1 class="title">{{ item.title }}</h1>
 
-        <span class="type">
-          {{ item.type === "series" ? "Сериал" : "Фильм" }}
-        </span>
+        <div class="badges">
+          <span class="status">
+            <template v-if="item.status === 'want'">Хочу посмотреть</template>
+            <template v-else-if="item.status === 'watching'">Смотрю</template>
+            <template v-else-if="item.status === 'done'">Просмотрено</template>
+            <template v-else-if="item.status === 'abandoned'">Заброшено</template>
+          </span>
+
+          <span class="type">
+            {{ item.type === "series" ? "Сериал" : "Фильм" }}
+          </span>
+        </div>
       </div>
 
       <div class="content">
@@ -273,11 +285,9 @@ function markAsWatched() {
           </button>
         </div>
 
-        <button v-else class="btn accent" @click="markAsWatched">
-          ✔ Просмотрено
-        </button>
+        <button v-else class="btn dark" @click="markAsWatched">Просмотрено</button>
 
-        <button class="btn dark" @click="startEdit">Редактировать</button>
+        <button class="btn accent" @click="startEdit">Редактировать</button>
 
         <button class="btn danger" @click="remove">Удалить</button>
       </div>
@@ -363,8 +373,10 @@ function markAsWatched() {
       </div>
 
       <div class="actions">
-        <button class="btn accent" @click="save">Сохранить</button>
-        <button class="btn dark" @click="cancelEdit">Отмена</button>
+        <div class="actions">
+          <button class="btn dark" @click="save">Сохранить</button>
+          <button class="btn neutral" @click="cancelEdit">Отмена</button>
+        </div>
       </div>
     </div>
   </div>
@@ -476,6 +488,7 @@ function markAsWatched() {
   flex-direction: column;
   gap: 14px;
   min-width: 0;
+  align-items: center;
 }
 
 .description {
@@ -764,5 +777,32 @@ textarea {
   font-family: inherit;
   resize: vertical;
 
+}
+
+.badges {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.status {
+  font-size: 12px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: #1a172c;
+  color: #fefefe;
+  white-space: nowrap;
+}
+
+.neutral {
+  background: #fefefe;
+  color: #1a172c;
+  border: 1px solid #e5e5e5;
+}
+
+.neutral:hover {
+  background: #fdeabf;
+  border-color: #fdb688;
 }
 </style>

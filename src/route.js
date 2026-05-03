@@ -1,12 +1,10 @@
 import { createRouter, createWebHistory } from "vue-router"
-
+import { useUsers } from "./composables/useUsers"
 import HomePage from "./components/pages/HomePage.vue"
 import LoginPage from "./components/auth/LoginPage.vue"
 import RegisterForm from "./components/auth/RegisterForm.vue"
 import MediaPage from "./components/pages/MediaPage.vue"
-import TestPage from "./components/pages/test.vue"
 
-import { useUsers } from "./composables/useUsers"
 
 // =========================
 // РОУТЫ
@@ -41,12 +39,6 @@ const routes = [
   },
 
   {
-    path: "/test",
-    name: "test",
-    component: TestPage
-  },
-
-  {
     path: "/:pathMatch(.*)*",
     redirect: "/"
   }
@@ -56,7 +48,7 @@ export const router = createRouter({
   history: createWebHistory(),
   routes
 })
- 
+
 
 // --- ПРОВЕРКА АВТОРИЗАЦИИ ---
 router.beforeEach((to, from, next) => {

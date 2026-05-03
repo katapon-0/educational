@@ -27,6 +27,34 @@ const users = ref(
     ]
 )
 
+// =========================
+// РЕДАКТИРОВАНИЕ ДАННЫХ ПОЛЬЗОВАТЕЛЯ
+// =========================
+function updateCurrentUser(data) {
+    if (!currentUser.value) return false
+
+    const userIndex = users.value.findIndex(
+        u => u.id === currentUser.value.id
+    )
+
+    if (userIndex === -1) return false
+
+    // обновляем пользователя в списке
+    users.value[userIndex] = {
+        ...users.value[userIndex],
+        ...data
+    }
+
+    // обновляем текущего пользователя
+    currentUser.value = {
+        ...users.value[userIndex]
+    }
+
+    saveUsers()
+    saveCurrentUser()
+
+    return true
+}
 
 // =========================
 // СИНХРОНИЗАЦИЯ
@@ -72,8 +100,8 @@ function register(newUser) {
     const exists = users.value.find(u => u.login === newUser.login)
     if (exists) return false
 
-  // глубокое клонирование defaultMedia
-  const userMediaCopy = structuredClone(defaultMedia)
+    // глубокое клонирование defaultMedia
+    const userMediaCopy = structuredClone(defaultMedia)
 
     const user = {
         id: users.value.length + 1,
@@ -199,6 +227,7 @@ export function useUsers() {
         users,
         currentUser,
         userMedia,
+        updateCurrentUser,
 
         // авторизация
         login,

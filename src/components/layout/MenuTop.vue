@@ -3,7 +3,9 @@ import { computed, ref } from "vue"
 import { useRouter } from "vue-router"
 import { useUsers } from "../../composables/useUsers"
 import logowl from "../../assets/icons/logowl.png"
+import iconedit from "../../assets/icons/edituser.png"
 import AddItemModal from "../Media/AddItemModal.vue"  // модалка напрямую
+import EditUserModal from "../Media/EditUserModal.vue"
 
 const router = useRouter()
 const { currentUser, logout } = useUsers()
@@ -15,23 +17,34 @@ const isAuth = computed(() => !!currentUser.value)
 
 // +управление модалкой добавления прямо в шапке
 const addModalVisible = ref(false)
+const editModalVisible = ref(false)
 
 function goHome() {
-  router.push("/")
+  router.push({ name: "home" })
 }
 function goLogin() {
-  router.push("/login")
+  router.push({ name: "login" })
 }
 function handleLogout() {
   logout()
-  router.push("/login")
+  router.push({ name: "login" })
 }
+
 function openAddModal() {
   addModalVisible.value = true
 }
 function closeAddModal() {
   addModalVisible.value = false
 }
+
+function openEditModal() {
+  editModalVisible.value = true
+}
+function closeEditModal() {
+  editModalVisible.value = false
+}
+
+
 </script>
 
 <template>
@@ -49,6 +62,9 @@ function closeAddModal() {
           <button @click="goLogin" class="btn">Войти</button>
         </div>
         <div v-else class="user">
+          <button class="icon-btn" @click="openEditModal" title="Профиль">
+            <img :src="iconedit" alt="edit" class="icon-img" />
+          </button>
           <span class="username">{{ userName }}</span>
           <button @click="openAddModal" class="btn btn-accent">+ Добавить</button>
           <button @click="handleLogout" class="btn">Выйти</button>
@@ -58,6 +74,7 @@ function closeAddModal() {
   </header>
 
   <AddItemModal v-if="addModalVisible" @close="closeAddModal" />
+  <EditUserModal v-if="editModalVisible" @close="closeEditModal" />
 </template>
 
 <style scoped>
@@ -155,4 +172,33 @@ function closeAddModal() {
   border: 2px;
   border-color: #fdb688;
 }
+
+.icon-btn {
+  width: 36px;
+  height: 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+ 
+  background: transparent;
+  color: #fefefe;
+
+  cursor: pointer;
+  transition: 0.2s ease;
+
+  font-size: 16px;
+}
+
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.icon-img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  transition: 0.2s ease;
+}
+
 </style>

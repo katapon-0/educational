@@ -5,6 +5,9 @@ import defaultMedia from "../../data/defaultMedia"
 import plugFilm from "../../assets/img/plug-film.png"
 import plugSeries from "../../assets/img/plug-series.png"
 
+const MIN_WATCH_DATE = "2026-01-01"
+const MAX_WATCH_DATE = "2100-01-01"
+
 const availableImages = [
   { src: plugFilm, label: "Заглушка (фильм)" },
   { src: plugSeries, label: "Заглушка (сериал)" },
@@ -27,14 +30,18 @@ const manualForm = ref({
   link: "",
   duration: null,
   totalEpisodes: null,
-  image: plugFilm,   // значение по умолчанию
+  image: plugFilm,
   description: ""
 })
 
 const showImageSelect = ref(false)
 const imageSelectRef = ref(null)
-function toggleImageSelect() { showImageSelect.value = !showImageSelect.value }
 const selectedImage = ref(null)
+
+function toggleImageSelect() {
+  showImageSelect.value = !showImageSelect.value
+}
+
 function selectImage(img) {
   manualForm.value.image = img.src
   selectedImage.value = img
@@ -42,7 +49,37 @@ function selectImage(img) {
 }
 
 // =========================
-// ДОБАВЛЕНИЕ ИЗ БАЗЫ/ теперь через find
+// КАЛЕНДАРЬ
+// =========================
+const dateInput = ref(null)
+
+function openDatePicker() {
+  const input = dateInput.value
+  if (!input) return
+
+  if (input.showPicker) {
+    input.showPicker()
+  } else {
+    input.focus()
+    input.click()
+  }
+}
+
+function validateWatchDate() {
+  const date = manualForm.value.watchDate
+  if (!date) return
+
+  if (date < MIN_WATCH_DATE) {
+    errors.value.watchDate = "Дата не может быть раньше 01.01.2026"
+  } else if (date > MAX_WATCH_DATE) {
+    errors.value.watchDate = "Дата не может быть позже 01.01.2100"
+  } else {
+    delete errors.value.watchDate
+  }
+}
+
+// =========================
+// ДОБАВЛЕНИЕ ИЗ БАЗЫ
 // =========================
 function addSelected() {
   if (!validateSelect()) return
@@ -66,7 +103,6 @@ function addSelected() {
   }
 
   addMediaToUser(newItem)
-
   successMessage.value = "Добавлено успешно"
   emit("close")
 }
@@ -82,7 +118,7 @@ function addManual() {
     type: manualForm.value.type,
     watchDate: manualForm.value.watchDate || null,
     link: manualForm.value.link || null,
-    description: "",
+    description: manualForm.value.description || "",
     image: manualForm.value.image || ""
   }
 
@@ -93,14 +129,15 @@ function addManual() {
   }
 
   addMediaToUser(newItem)
-
   successMessage.value = "Добавлено успешно"
   emit("close")
 }
 
+// =========================
+// ВАЛИДАЦИЯ
+// =========================
 const errors = ref({})
 const successMessage = ref("")
-
 
 function validateSelect() {
   errors.value = {}
@@ -125,6 +162,15 @@ function validateManual() {
     errors.value.type = "Выберите тип"
   }
 
+  // дата
+  if (manualForm.value.watchDate) {
+    if (manualForm.value.watchDate < MIN_WATCH_DATE) {
+      errors.value.watchDate = "Дата не может быть раньше 01.01.2026"
+    } else if (manualForm.value.watchDate > MAX_WATCH_DATE) {
+      errors.value.watchDate = "Дата не может быть позже 01.01.2100"
+    }
+  }
+
   if (manualForm.value.type === "series") {
     if (
       manualForm.value.totalEpisodes === null ||
@@ -145,24 +191,6 @@ function validateManual() {
 
   return Object.keys(errors.value).length === 0
 }
-
-//для фикса нажатия календаря
-const dateInput = ref(null) //по умолчанию нулл, потом загрузится другое значение
-
-function openDatePicker() { // https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement 
-  //если простыми словами,шоупикер это команда "открой это"
-  const input = dateInput.value
-  if (!input) return
-
-  if (input.showPicker) { //если шоу пикер поддерживается в браузере
-    input.showPicker() //нажать
-  } else {
-    input.focus() //навести 
-    input.click() //кликнуть
-  }
-}
-
-
 </script>
 
 <template>
@@ -180,7 +208,7 @@ function openDatePicker() { // https://developer.mozilla.org/en-US/docs/Web/API/
           </button>
         </div>
 
-        <!-- ВЫБОР ИЗ БАЗЫ -->
+        <!-- SELECT -->
         <div v-if="mode === 'select'">
           <select v-model="selectedId">
             <option disabled value="">Выберите...</option>
@@ -189,37 +217,48 @@ function openDatePicker() { // https://developer.mozilla.org/en-US/docs/Web/API/
             </option>
           </select>
 
-          <small v-if="errors.selectedId" class="error">
-            {{ errors.selectedId }}
-          </small>
+          <small v-if="errors.selectedId" class="error">{{ errors.selectedId }}</small>
+
           <div class="actions">
             <button @click="addSelected" :disabled="!selectedId">Добавить</button>
             <button @click="$emit('close')">Отмена</button>
           </div>
         </div>
 
-        <!-- РУЧНОЕ ДОБАВЛЕНИЕ -->
+        <!-- MANUAL -->
         <div v-else>
           <input v-model="manualForm.title" placeholder="Название *" />
           <small v-if="errors.title" class="error">{{ errors.title }}</small>
+
           <select v-model="manualForm.type">
             <option value="film">Фильм</option>
             <option value="series">Сериал</option>
           </select>
 
           <small v-if="errors.type" class="error">{{ errors.type }}</small>
-          <input type="date" v-model="manualForm.watchDate" placeholder="Дата просмотра" />
+
+          <!-- КАЛЕНДАРЬ -->
+          <div class="date-picker" @click="openDatePicker">
+            <div class="custom-date-select">
+              <input ref="dateInput" type="date" v-model="manualForm.watchDate" :min="MIN_WATCH_DATE"
+                :max="MAX_WATCH_DATE" class="hidden-date-input" @change="validateWatchDate" />
+            </div>
+          </div>
+
+          <small v-if="errors.watchDate" class="error">{{ errors.watchDate }}</small>
+
           <input v-model="manualForm.link" placeholder="Ссылка" />
           <input v-model="manualForm.description" placeholder="Описание" />
 
-          <!-- выбор обложки -->
-          <div class="custom-select" @click="toggleImageSelect" ref="imageSelectRef">
+          <!-- IMAGE -->
+          <div class="custom-select" @click="toggleImageSelect">
             <div class="custom-select__trigger">
               <span>
                 {{ selectedImage ? selectedImage.label : 'Выберите обложку' }}
               </span>
               <span class="custom-select__arrow">▼</span>
             </div>
+
             <div v-if="showImageSelect" class="custom-select__options">
               <div v-for="img in availableImages" :key="img.src" class="custom-select__option"
                 @click.stop="selectImage(img)">
@@ -228,19 +267,21 @@ function openDatePicker() { // https://developer.mozilla.org/en-US/docs/Web/API/
               </div>
             </div>
           </div>
+
           <img v-if="manualForm.image" :src="manualForm.image" class="image-preview" />
 
+          <!-- DURATION / EPISODES -->
           <div v-if="manualForm.type === 'film'">
             <input type="number" v-model="manualForm.duration" placeholder="Длительность (мин)" />
             <small v-if="errors.duration" class="error">{{ errors.duration }}</small>
           </div>
+
           <div v-else>
             <input type="number" v-model="manualForm.totalEpisodes" placeholder="Количество серий" />
             <small v-if="errors.totalEpisodes" class="error">{{ errors.totalEpisodes }}</small>
           </div>
-          <small v-if="successMessage" class="success">
-            {{ successMessage }}
-          </small>
+
+          <small v-if="successMessage" class="success">{{ successMessage }}</small>
 
           <div class="actions">
             <button @click="addManual" :disabled="!manualForm.title">Добавить</button>
@@ -380,7 +421,7 @@ input::placeholder {
 }
 
 .error {
-  color: #d93025;
+  color: #b24a4a;
   font-size: 12px;
   margin-top: 4px;
 }
