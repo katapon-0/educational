@@ -20,11 +20,6 @@ const isSeries = computed(() => props.item.type === "series")
 
 const statusLabel = computed(() => statusLabels[props.item.status] ?? props.item.status)
 
-
-const formattedDuration = computed(() => {
-  return props.item.duration ?? "?" //если есть длительность показываем, иначе ?
-})
-
 const currentProgress = computed(() => props.item.progress ?? 0)
 
 const totalEpisodes = computed(() => props.item.totalEpisodes ?? null)
@@ -56,10 +51,11 @@ const isOverdue = computed(() => {
 })
 
 //дата добавления
-const formattedDateAdded = computed(() => {
-  if (!props.item.dateAdded) return ""
-  return new Date(props.item.dateAdded).toLocaleDateString("ru-RU")
-})
+const formattedDateAdded = computed(() =>
+  props.item.dateAdded
+    ? new Date(props.item.dateAdded).toLocaleDateString("ru-RU")
+    : ""
+)
 
 function open() {
   router.push({
@@ -125,6 +121,7 @@ function openDatePicker() { // https://developer.mozilla.org/en-US/docs/Web/API/
   }
 }
 
+
 </script>
 
 <template>
@@ -183,7 +180,7 @@ function openDatePicker() { // https://developer.mozilla.org/en-US/docs/Web/API/
       </div>
 
       <p v-else class="meta">
-        ⏱ {{ item.duration ?? "?" }} мин
+        ⏱ {{ item.episodeDuration ?? item.duration ?? "?" }} мин
       </p>
 
       <div class="buttons">
@@ -427,5 +424,4 @@ function openDatePicker() { // https://developer.mozilla.org/en-US/docs/Web/API/
   color: #c36b65;
   font-weight: 600;
 }
-
 </style>

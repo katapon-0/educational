@@ -48,6 +48,15 @@ const filteredMedia = computed(() => {
   else if (sortType.value === "date-desc") list = sortByDate(list, "desc");
   else if (sortType.value === "overdue") list = getOverdue(list);
 
+  list = [...list].sort((a, b) => {
+    const aAbandoned = a.status === "abandoned";
+    const bAbandoned = b.status === "abandoned";
+
+    if (aAbandoned && !bAbandoned) return 1;
+    if (!aAbandoned && bAbandoned) return -1;
+    return 0;
+  });
+
   return list;
 });
 </script>
