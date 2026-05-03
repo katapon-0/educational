@@ -34,7 +34,12 @@ const manualForm = ref({
 const showImageSelect = ref(false)
 const imageSelectRef = ref(null)
 function toggleImageSelect() { showImageSelect.value = !showImageSelect.value }
-function selectImage(imgSrc) { manualForm.value.image = imgSrc; showImageSelect.value = false }
+const selectedImage = ref(null)
+function selectImage(img) {
+  manualForm.value.image = img.src
+  selectedImage.value = img
+  showImageSelect.value = false
+}
 
 // =========================
 // ДОБАВЛЕНИЕ ИЗ БАЗЫ/ теперь через find
@@ -141,6 +146,23 @@ function validateManual() {
   return Object.keys(errors.value).length === 0
 }
 
+//для фикса нажатия календаря
+const dateInput = ref(null) //по умолчанию нулл, потом загрузится другое значение
+
+function openDatePicker() { // https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement 
+  //если простыми словами,шоупикер это команда "открой это"
+  const input = dateInput.value
+  if (!input) return
+
+  if (input.showPicker) { //если шоу пикер поддерживается в браузере
+    input.showPicker() //нажать
+  } else {
+    input.focus() //навести 
+    input.click() //кликнуть
+  }
+}
+
+
 </script>
 
 <template>
@@ -193,11 +215,14 @@ function validateManual() {
           <!-- выбор обложки -->
           <div class="custom-select" @click="toggleImageSelect" ref="imageSelectRef">
             <div class="custom-select__trigger">
-              <span>{{ manualForm.image ? 'Выбрано' : 'Выберите обложку' }}</span>
+              <span>
+                {{ selectedImage ? selectedImage.label : 'Выберите обложку' }}
+              </span>
               <span class="custom-select__arrow">▼</span>
             </div>
             <div v-if="showImageSelect" class="custom-select__options">
-              <div v-for="img in availableImages" :key="img.src" class="custom-select__option" @click.stop="selectImage(img.src)">
+              <div v-for="img in availableImages" :key="img.src" class="custom-select__option"
+                @click.stop="selectImage(img)">
                 <img :src="img.src" class="option-img" />
                 <span>{{ img.label }}</span>
               </div>
@@ -373,6 +398,7 @@ input::placeholder {
   border: 1px solid #e5e5e5;
   border-radius: 12px;
 }
+
 .custom-select__trigger {
   display: flex;
   justify-content: space-between;
@@ -380,10 +406,12 @@ input::placeholder {
   padding: 10px 14px;
   font-size: 14px;
 }
+
 .custom-select__arrow {
   font-size: 10px;
   color: #999;
 }
+
 .custom-select__options {
   position: absolute;
   top: 100%;
@@ -397,21 +425,25 @@ input::placeholder {
   z-index: 10;
   margin-top: 4px;
 }
+
 .custom-select__option {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 8px 14px;
 }
+
 .custom-select__option:hover {
   background: #fdeabf;
 }
+
 .option-img {
   width: 28px;
   height: 28px;
   object-fit: cover;
   border-radius: 4px;
 }
+
 .image-preview {
   margin-top: 8px;
   width: 100px;
@@ -420,6 +452,7 @@ input::placeholder {
   border-radius: 10px;
   border: 1px solid #e5e5e5;
 }
+
 .watch-btn {
   display: inline-block;
   text-decoration: none;
@@ -429,8 +462,8 @@ input::placeholder {
   border-radius: 40px;
   margin-top: 12px;
 }
+
 .watch-btn:hover {
   background: #2d2a44;
 }
-
 </style>

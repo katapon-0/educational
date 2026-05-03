@@ -73,6 +73,12 @@ function closeImageSelect(e) {
   }
 }
 
+//для отображения названия в списке (выбрать картинку)
+const selectedImageLabel = computed(() => {
+  const found = availableImages.find(img => img.src === form.value.image)
+  return found ? found.label : "Выберите изображение"
+})
+
 // =========================
 // СИНХРОНИЗАЦИЯ ДАННЫХ → ФОРМА
 // =========================
@@ -256,13 +262,7 @@ function markAsWatched() {
             </span>
           </div>
           <!-- кнопка "Смотреть онлайн" -->
-          <a
-            v-if="item.link"
-            :href="item.link"
-            target="_blank"
-            class="btn accent watch-btn"
-            >Смотреть онлайн</a
-          >
+          <a v-if="item.link" :href="item.link" target="_blank" class="btn accent watch-btn">Смотреть онлайн</a>
         </div>
       </div>
       <div class="actions">
@@ -310,22 +310,14 @@ function markAsWatched() {
         <!-- выбор изображения из списка -->
         <div class="field">
           <label>Обложка</label>
-          <div
-            class="custom-select"
-            @click="toggleImageSelect"
-            ref="imageSelectRef"
-          >
+          <div class="custom-select" @click="toggleImageSelect" ref="imageSelectRef">
             <div class="custom-select__trigger">
-              <span>{{ form.image ? "Выбрано" : "Выберите изображение" }}</span>
+              <span>{{ selectedImageLabel }}</span>
               <span class="custom-select__arrow">▼</span>
             </div>
             <div v-if="showImageSelect" class="custom-select__options">
-              <div
-                v-for="img in availableImages"
-                :key="img.src"
-                class="custom-select__option"
-                @click.stop="selectImage(img.src)"
-              >
+              <div v-for="img in availableImages" :key="img.src" class="custom-select__option"
+                @click.stop="selectImage(img.src)">
                 <img :src="img.src" class="option-img" />
                 <span>{{ img.label }}</span>
               </div>
@@ -337,11 +329,7 @@ function markAsWatched() {
         <!-- описание -->
         <div class="field">
           <label>Описание</label>
-          <textarea
-            v-model="form.description"
-            placeholder="Описание фильма/сериала"
-            rows="3"
-          ></textarea>
+          <textarea v-model="form.description" placeholder="Описание фильма/сериала" rows="3"></textarea>
         </div>
 
         <!-- ссылка для просмотра -->
@@ -353,11 +341,7 @@ function markAsWatched() {
         <template v-if="form.type === 'series'">
           <div class="field">
             <label>Прогресс</label>
-            <input
-              v-model.number="form.progress"
-              type="number"
-              :max="form.totalEpisodes"
-            />
+            <input v-model.number="form.progress" type="number" :max="form.totalEpisodes" />
             <small v-if="errors.progress" class="error">{{
               errors.progress
             }}</small>
@@ -384,7 +368,9 @@ function markAsWatched() {
       </div>
     </div>
   </div>
-  <div v-else class="empty"><p>Медиа не найдено</p></div>
+  <div v-else class="empty">
+    <p>Медиа не найдено</p>
+  </div>
 </template>
 
 <style scoped>
@@ -757,4 +743,26 @@ select {
   background: #2d2a44;
 }
 
+input,
+select,
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: 12px 12px;
+  border: 1px solid #e5e5e5;
+  border-radius: 10px;
+
+  background: #fefefe;
+  color: #1a172c;
+
+  font-size: 15px;
+
+  transition: all 0.2s ease;
+
+  min-width: 0;
+  font-family: inherit;
+  resize: vertical;
+
+}
 </style>

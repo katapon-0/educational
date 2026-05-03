@@ -55,57 +55,32 @@ const filteredMedia = computed(() => {
 <template>
   <div class="list">
     <div class="filters">
-      <button
-        @click="typeFilter = 'all'"
-        :class="{ active: typeFilter === 'all' }"
-      >
+      <button @click="typeFilter = 'all'" :class="{ active: typeFilter === 'all' }">
         Все
       </button>
-      <button
-        @click="typeFilter = 'series'"
-        :class="{ active: typeFilter === 'series' }"
-      >
+      <button @click="typeFilter = 'series'" :class="{ active: typeFilter === 'series' }">
         Сериалы
       </button>
-      <button
-        @click="typeFilter = 'film'"
-        :class="{ active: typeFilter === 'film' }"
-      >
+      <button @click="typeFilter = 'film'" :class="{ active: typeFilter === 'film' }">
         Фильмы
       </button>
 
       <span class="separator"></span>
 
-      <button
-        @click="statusFilter = 'all'"
-        :class="{ active: statusFilter === 'all' }"
-      >
+      <button @click="statusFilter = 'all'" :class="{ active: statusFilter === 'all' }">
         Все статусы
       </button>
-      <button
-        v-for="st in statuses"
-        :key="st"
-        @click="statusFilter = st"
-        :class="{ active: statusFilter === st }"
-      >
+      <button v-for="st in statuses" :key="st" @click="statusFilter = st" :class="{ active: statusFilter === st }">
         {{ statusLabels[st] }}
       </button>
 
       <span class="separator"></span>
 
       <!-- кастомный селект сортировки -->
-      <div
-        class="custom-select"
-        @click="toggleSortDropdown"
-        ref="sortSelectRef"
-      >
+      <div class="custom-select" @click="toggleSortDropdown" ref="sortSelectRef">
         <div class="custom-select__trigger">
           <span>
-            <img
-              :src="sortType === 'overdue' ? iconWarning : iconCalendar"
-              class="sort-icon"
-              alt="sort"
-            />
+            <img :src="sortType === 'overdue' ? iconWarning : iconCalendar" class="sort-icon" alt="sort" />
             {{
               sortType === "date-asc"
                 ? "Ближайшие"
@@ -131,12 +106,7 @@ const filteredMedia = computed(() => {
     </div>
 
     <div class="grid">
-      <MediaCard
-        v-for="item in filteredMedia"
-        :key="item.id"
-        :item="item"
-        @delete="emit('delete', item.id)"
-      />
+      <MediaCard v-for="item in filteredMedia" :key="item.id" :item="item" @delete="emit('delete', item.id)" />
     </div>
   </div>
 </template>
@@ -184,6 +154,7 @@ const filteredMedia = computed(() => {
   height: 24px;
   background: #e0e0e0;
   margin: 0 4px;
+  align-self: center;
 }
 
 .sort-icon {
@@ -235,16 +206,19 @@ const filteredMedia = computed(() => {
   color: #1a172c;
   transition: border-color 0.2s;
 }
+
 .custom-select__trigger {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 8px 14px;
 }
+
 .custom-select__arrow {
   font-size: 10px;
   color: #999;
 }
+
 .custom-select__options {
   position: absolute;
   top: calc(100% + 4px);
@@ -257,10 +231,12 @@ const filteredMedia = computed(() => {
   z-index: 10;
   overflow: hidden;
 }
+
 .custom-select__option {
   padding: 10px 14px;
   transition: 0.2s;
 }
+
 .custom-select__option:hover {
   background: #fdeabf;
 }

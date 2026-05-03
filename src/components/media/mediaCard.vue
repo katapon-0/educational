@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from "vue"
+import { computed, ref } from "vue"
 import { useRouter } from "vue-router"
 import { useMedia } from "../../composables/useMedia"
 
@@ -62,7 +62,10 @@ const formattedDateAdded = computed(() => {
 })
 
 function open() {
-  router.push(`/media/${props.item.id}`)
+  router.push({
+    name: "media",
+    params: { id: props.item.id }
+  })
 }
 
 function remove() {
@@ -108,6 +111,20 @@ const progressPercent = computed(() => {
   return Math.min((current / total) * 100, 100)
 })
 
+//для фикса нажатия календаря
+const dateInput = ref(null) //по умолчанию нулл, потом загрузится другое значение
+
+function openDatePicker() { // https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement 
+  if (!dateInput.value) return //чтобы не ругался что dateinput каннот рид пропертдис оф нулл
+  //если простыми словами,шоупикер это команда "открой это"
+  if (dateInput.value.showPicker) { //если шоу пикер поддерживается в браузере
+    dateInput.value.showPicker() //нажать
+  } else {  
+    dateInput.value.focus() //навести на календарь
+    dateInput.value.click() //кликнуть
+  }
+}
+
 </script>
 
 <template>
@@ -132,7 +149,7 @@ const progressPercent = computed(() => {
       <div v-if="item.status !== 'done'" class="date-picker">
         <label class="meta">Назначить дату просмотра:</label>
 
-        <div class="custom-date-select">
+        <div class="custom-date-select" @click="openDatePicker">
           <img src="../../assets/icons/calendar.png" class="calendar-icon" />
           <span class="selected-date">
             {{ item.watchDate ? new Date(item.watchDate).toLocaleDateString("ru-RU") : "Не выбрана" }}
@@ -140,13 +157,8 @@ const progressPercent = computed(() => {
           <span class="custom-select__arrow">▼</span>
 
           <!-- скрытый нативный input, перекрывает всю обёртку и открывает календарь -->
-          <input
-            type="date"
-            :value="item.watchDate ?? ''"
-            @change="onWatchDateChange"
-            class="hidden-date-input"
-            tabindex="-1"
-          />
+          <input ref="dateInput" type="date" :value="item.watchDate ?? ''" @change="onWatchDateChange"
+            class="hidden-date-input" />
         </div>
       </div>
 
@@ -330,8 +342,10 @@ const progressPercent = computed(() => {
   height: 100%;
   opacity: 0;
   cursor: pointer;
-  z-index: 1;
+  z-index: 10;
+  pointer-events: none;
 }
+
 
 .progress {
   display: flex;
