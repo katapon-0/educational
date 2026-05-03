@@ -25,7 +25,7 @@ function validate() {
   if (!login) {
     errors.value.login = "Введите логин"
   } else if (login.length < 3) {
-    errors.value.login = "Логин должен быть минимум 3 символа"
+    errors.value.login = "Логин минимум 3 символа"
   } else {
     // проверка уникальности логина
     const exists = users.value.some(
@@ -46,7 +46,7 @@ function validate() {
   if (!password) {
     errors.value.password = "Введите пароль"
   } else if (password.length < 6) {
-    errors.value.password = "Пароль должен быть минимум 6 символов"
+    errors.value.password = "Пароль минимум 6 символов"
   }
 
   return Object.keys(errors.value).length === 0

@@ -150,7 +150,7 @@ function getStats(list) {
         (acc, m) => { //acc - сюда мы накапливаем значения, m - текущий элемент массива
             acc[m.status] = (acc[m.status] || 0) + 1 //статус - если значения нет, то 0 и увеличиваем счётчик на единицу
             acc.total++ //общее кол-во элементов
-            return acc //незн че он возвращает но без него всё падает
+            return acc 
         },
         { want: 0, watching: 0, done: 0, abandoned: 0, total: 0 }
     )
@@ -183,7 +183,7 @@ function getSuggestion(list) {
 }
 
 // =========================
-// ЭКСПОПТ :-D
+// ЭКСПОРТ :-D
 // =========================
 export function useMedia() {
     return {

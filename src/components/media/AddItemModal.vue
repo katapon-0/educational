@@ -208,7 +208,6 @@ function validateManual() {
           </button>
         </div>
 
-        <!-- SELECT -->
         <div v-if="mode === 'select'">
           <select v-model="selectedId">
             <option disabled value="">Выберите...</option>
@@ -225,7 +224,6 @@ function validateManual() {
           </div>
         </div>
 
-        <!-- MANUAL -->
         <div v-else>
           <input v-model="manualForm.title" placeholder="Название *" />
           <small v-if="errors.title" class="error">{{ errors.title }}</small>
@@ -237,7 +235,6 @@ function validateManual() {
 
           <small v-if="errors.type" class="error">{{ errors.type }}</small>
 
-          <!-- КАЛЕНДАРЬ -->
           <div class="date-picker" @click="openDatePicker">
             <div class="custom-date-select">
               <input ref="dateInput" type="date" v-model="manualForm.watchDate" :min="MIN_WATCH_DATE"
@@ -250,7 +247,6 @@ function validateManual() {
           <input v-model="manualForm.link" placeholder="Ссылка" />
           <input v-model="manualForm.description" placeholder="Описание" />
 
-          <!-- IMAGE -->
           <div class="custom-select" @click="toggleImageSelect">
             <div class="custom-select__trigger">
               <span>
@@ -270,7 +266,6 @@ function validateManual() {
 
           <img v-if="manualForm.image" :src="manualForm.image" class="image-preview" />
 
-          <!-- DURATION / EPISODES -->
           <div v-if="manualForm.type === 'film'">
             <input type="number" v-model="manualForm.duration" placeholder="Длительность (мин)" />
             <small v-if="errors.duration" class="error">{{ errors.duration }}</small>
