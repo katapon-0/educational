@@ -169,8 +169,6 @@ const filteredMedia = computed(() => {
   border: 1px solid #1a172c;
 }
 
-
-
 .separator {
   width: 1px;
   height: 24px;

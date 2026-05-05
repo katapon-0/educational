@@ -167,7 +167,7 @@ function addMediaToUser(item) {
         status: item.status || "want",
         watchDate: item.watchDate || null,  
         link: item.link || null,
-        // episodeDuration: item.episodeDuration || null,
+        episodeDuration: item.episodeDuration || null,
         totalEpisodes: item.totalEpisodes || null,
         duration: item.duration || null,
         progress: 0,
