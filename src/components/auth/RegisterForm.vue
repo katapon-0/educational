@@ -118,6 +118,7 @@ function submit() {
 
   color: #1a172c;
   box-sizing: border-box;
+  align-items: stretch;
 }
 
 .form h2 {

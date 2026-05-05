@@ -150,7 +150,7 @@ function getStats(list) {
         (acc, m) => { //acc - сюда мы накапливаем значения, m - текущий элемент массива
             acc[m.status] = (acc[m.status] || 0) + 1 //статус - если значения нет, то 0 и увеличиваем счётчик на единицу
             acc.total++ //общее кол-во элементов
-            return acc 
+            return acc
         },
         { want: 0, watching: 0, done: 0, abandoned: 0, total: 0 }
     )
@@ -159,28 +159,49 @@ function getStats(list) {
 // =========================
 // ПРЕДЛОЖЕНИЕ
 // =========================
-function getSuggestion(list) {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
 
-    const overdue = []
-    const normal = []
+function pickRandom(arr) {
+    return arr[Math.floor(Math.random() * arr.length)]
+}
+
+function getSuggestion(list) {
+    const active = []
+    const done = []
+    const abandoned = []
 
     for (const item of list) {
-        if (item.status !== "want" && item.status !== "watching") continue
-
-        if (item.watchDate && new Date(item.watchDate) < today) {
-            overdue.push(item)
-        } else {
-            normal.push(item)
+        if (item.status === "want" || item.status === "watching") {
+            active.push(item)
+        } else if (item.status === "done") {
+            done.push(item)
+        } else if (item.status === "abandoned") {
+            abandoned.push(item)
         }
     }
 
-    const pool = [...overdue, ...normal]
-    if (!pool.length) return null
+    // 1. активные всегда приоритет
+    if (active.length) {
+        return pickRandom(active)
+    }
 
-    return pool[Math.floor(Math.random() * pool.length)]
+    // 2. если всё просмотрено -> сначала пробуем заброшенные
+    if (done.length && abandoned.length) {
+        return pickRandom(abandoned)
+    }
+
+    // 3. если заброшенных нет -> даём просмотренные
+    if (done.length) {
+        return pickRandom(done)
+    }
+
+    // 4. если остались только заброшенные
+    if (abandoned.length) {
+        return pickRandom(abandoned)
+    }
+
+    return null
 }
+
 
 // =========================
 // ЭКСПОРТ :-D

@@ -89,9 +89,11 @@ function submit() {
   gap: 14px;
   color: #1a172c;
   box-sizing: border-box;
+  align-items: stretch;
 }
 
 .field {
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -136,8 +138,6 @@ input::placeholder {
 
 button {
   width: 100%;
-  max-width: 200px;
-
   border: none;
   background: #1a172c;
   color: #fefefe;

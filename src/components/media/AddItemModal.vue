@@ -381,9 +381,9 @@ input::placeholder {
 
 
 .actions button:first-child {
-  background: #fdb688;
-  color: #1a172c;
-  border: none;
+  background: #1a172c;
+  color: #fefefe;
+  border: 1px solid #1a172c;
   border-radius: 10px;
   padding: 8px 14px;
   cursor: pointer;
@@ -391,7 +391,7 @@ input::placeholder {
 }
 
 .actions button:first-child:hover {
-  background: #fdeabf;
+      opacity: 0.92;
 }
 
 .actions button:first-child:disabled {
@@ -402,7 +402,7 @@ input::placeholder {
 
 .actions button:last-child {
   background: transparent;
-  color: #1a172c;
+  color: #1f1d2d;
   border: 1px solid #e5e5e5;
   border-radius: 10px;
   padding: 8px 14px;

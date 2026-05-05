@@ -15,16 +15,7 @@ const currentUser = ref(
 // =========================
 
 const users = ref(
-    JSON.parse(localStorage.getItem("users")) || [
-        {
-            id: 1,
-            login: "admin",
-            password: "admin",
-            name: "Админ",
-            role: "admin",
-            media: structuredClone(defaultMedia)
-        }
-    ]
+    JSON.parse(localStorage.getItem("users")) || []
 )
 
 // =========================
@@ -102,13 +93,12 @@ function register(newUser) {
 
     // глубокое клонирование defaultMedia
     const userMediaCopy = structuredClone(defaultMedia)
-
+    const maxId = Math.max(0, ...users.value.map(u => u.id || 0))
     const user = {
-        id: users.value.length + 1,
+        id: maxId +1,
         login: newUser.login,
         password: newUser.password,
         name: newUser.name || "",
-        role: "user",
         media: userMediaCopy
     }
 
@@ -177,7 +167,7 @@ function addMediaToUser(item) {
         status: item.status || "want",
         watchDate: item.watchDate || null,  
         link: item.link || null,
-        episodeDuration: item.episodeDuration || null,
+        // episodeDuration: item.episodeDuration || null,
         totalEpisodes: item.totalEpisodes || null,
         duration: item.duration || null,
         progress: 0,
