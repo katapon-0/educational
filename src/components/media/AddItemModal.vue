@@ -391,7 +391,7 @@ input::placeholder {
 }
 
 .actions button:first-child:hover {
-      opacity: 0.92;
+  opacity: 0.92;
 }
 
 .actions button:first-child:disabled {
@@ -502,4 +502,87 @@ input::placeholder {
 .watch-btn:hover {
   background: #2d2a44;
 }
+
+@media (max-width: 768px) {
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 18px 18px 0 0;
+    padding: 18px 14px 20px;
+    max-height: 92vh;
+    overflow-y: auto;
+  }
+
+  .modal h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  .tabs {
+    flex-direction: column;
+    gap: 8px;
+    margin: 12px 0;
+  }
+
+  .tabs button {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  select,
+  input {
+    margin: 6px 0;
+    padding: 11px 12px;
+    font-size: 14px;
+  }
+
+  .custom-select__trigger {
+    padding: 11px 12px;
+    font-size: 14px;
+  }
+
+  .custom-select__option {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .option-img {
+    width: 26px;
+    height: 26px;
+  }
+
+  .image-preview {
+    width: 100%;
+    max-width: 180px;
+    height: auto;
+    aspect-ratio: 5 / 7;
+    margin: 10px auto 0;
+    display: block;
+  }
+
+  .actions {
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .actions button {
+    width: 100%;
+    padding: 11px 14px;
+    font-size: 14px;
+  }
+
+  .date-picker {
+    margin: 6px 0;
+  }
+}
+
+
 </style>

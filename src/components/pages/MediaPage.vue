@@ -265,31 +265,35 @@ function markAsWatched() {
           </p>
 
           <div class="meta">
-            <span v-if="item.type === 'series'">
-              {{ item.progress || 0 }} / {{ item.totalEpisodes ?? "?" }} серий
-            </span>
-
-            <span v-else>
-              {{ item.episodeDuration || item.duration || "?" }} мин
-            </span>
+            <span v-if="item.type === 'film'"">
+              {{ item.episodeDuration || item.duration || " ?" }} мин </span>
           </div>
+
           <!-- кнопка "Смотреть онлайн" -->
           <a v-if="item.link" :href="item.link" target="_blank" class="btn accent watch-btn">Смотреть онлайн</a>
         </div>
       </div>
       <div class="actions">
-        <div v-if="item.type === 'series'" class="progress-actions">
-          <button class="btn round" @click="handleDecreaseProgress">−</button>
-          <button class="btn round accent" @click="handleIncreaseProgress">
-            +
-          </button>
+
+        <!-- прогресс только для сериалов -->
+        <div v-if="item.type === 'series'" class="progress-inline">
+          <button class="btn round neutral" @click="handleDecreaseProgress">−</button>
+
+          <span class="progress-text">
+            {{ item.progress || 0 }} / {{ item.totalEpisodes ?? "?" }}
+          </span>
+
+          <button class="btn round dark" @click="handleIncreaseProgress">+</button>
         </div>
 
-        <button v-else class="btn dark" @click="markAsWatched">Просмотрено</button>
+        <!-- фильм -->
+        <button v-if="item.type === 'film'" class="btn dark" @click="markAsWatched">
+          Просмотрено
+        </button>
 
         <button class="btn accent" @click="startEdit">Редактировать</button>
-
         <button class="btn danger" @click="remove">Удалить</button>
+
       </div>
     </div>
     <div v-else class="card edit-card">
@@ -389,7 +393,7 @@ function markAsWatched() {
 .page {
   max-width: 980px;
   margin: 0 auto;
-  padding: 110px 18px 60px;
+  padding: 25px 18px 60px;
 
   display: flex;
   flex-direction: column;
@@ -507,7 +511,7 @@ function markAsWatched() {
   flex-wrap: wrap;
   justify-content: center;
   gap: 10px;
-
+  align-items: center;
   padding-top: 12px;
   border-top: 1px solid #eee;
 }
@@ -517,9 +521,39 @@ function markAsWatched() {
   gap: 8px;
 }
 
+
+.progress-box {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.progress-inline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  padding: 6px 12px;
+  border-radius: 999px;
+
+}
+
+.progress-text {
+  font-size: 15px;
+  min-width: 60px;
+  text-align: center;
+  color: rgba(26, 23, 44, 0.8);
+}
+
 .btn {
   border-radius: 999px;
-  padding: 10px 20px;
+  height: 38px;
+  padding: 0 20px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 15px;
@@ -742,14 +776,21 @@ select {
 }
 
 .watch-btn {
-  display: inline-block;
-  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: white;
   background: #1a172c;
-  padding: 8px 18px;
-  border-radius: 40px;
+  text-decoration: none;
+
+  height: 38px;
+  padding: 0 18px;
+
+  border-radius: 999px;
   margin-top: 12px;
-  width: 150px;
+
+  width: auto;
+  min-width: 150px;
 }
 
 .watch-btn:hover {
@@ -804,5 +845,184 @@ textarea {
 .neutral:hover {
   background: #fdeabf;
   border-color: #fdb688;
+}
+
+@media (max-width: 768px) {
+  .page {
+    padding: 20px 12px 24px;
+    gap: 14px;
+  }
+
+  .btn-back {
+    padding: 7px 12px;
+    font-size: 13px;
+  }
+
+  .card {
+    padding: 14px;
+    gap: 14px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .title {
+    font-size: 22px;
+  }
+
+  .badges {
+    gap: 6px;
+  }
+
+  .content {
+    flex-direction: column;
+    gap: 14px;
+    align-items: center;
+  }
+
+  .cover {
+    width: 100%;
+    max-width: 320px;
+    height: auto;
+    aspect-ratio: 2 / 3;
+  }
+
+  .info {
+    width: 100%;
+    align-items: center;
+    text-align: center;
+  }
+
+  .description,
+  .meta {
+    font-size: 14px;
+  }
+
+  .watch-btn {
+    width: 100%;
+    max-width: 260px;
+    text-align: center;
+  }
+
+  .actions {
+    width: 100%;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .actions .btn {
+    flex: none;
+
+    width: auto;
+
+  }
+
+  .progress-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .progress-inline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+  }
+
+  .progress-text {
+    font-size: 15px;
+    min-width: 60px;
+    text-align: center;
+    color: rgba(26, 23, 44, 0.8);
+  }
+
+  .round {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    line-height: 1;
+  }
+
+  .edit-card {
+    padding: 16px;
+    gap: 14px;
+  }
+
+  .edit-card .title {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  .form {
+    gap: 12px;
+  }
+
+  .field {
+    gap: 4px;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 14px;
+    padding: 11px 12px;
+  }
+
+  .custom-select__trigger {
+    padding: 11px 12px;
+    font-size: 14px;
+  }
+
+  .custom-select__option {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .option-img {
+    width: 26px;
+    height: 26px;
+  }
+
+  .image-preview {
+    width: 100%;
+    max-width: 180px;
+    height: auto;
+    aspect-ratio: 5 / 7;
+    margin: 8px auto 0;
+    display: block;
+  }
+
+  .edit-card .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .edit-card .btn {
+    width: 100%;
+  }
+
+  .status,
+  .type {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+
+  .progress-inline {
+    width: 100%;
+    justify-content: center;
+  }
+
 }
 </style>

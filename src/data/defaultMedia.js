@@ -27,7 +27,7 @@ const defaultMedia = [
         status: "want",
         watchDate: null,
         link: "https://www.imdb.com/title/tt1219024/",
-        // episodeDuration: 43,
+        episodeDuration: 43,
         totalEpisodes: 173,
         progress: 0,
         image: casl
@@ -40,7 +40,7 @@ const defaultMedia = [
         status: "want",
         watchDate: null,
         link: "https://www.imdb.com/title/tt1196946/",
-        // episodeDuration: 43,
+        episodeDuration: 43,
         totalEpisodes: 151,
         progress: 0,
         image: mentalist
@@ -53,7 +53,7 @@ const defaultMedia = [
         status: "want",
         watchDate: null,
         link: "https://www.imdb.com/title/tt0460681/",
-        // episodeDuration: 60,
+        episodeDuration: 60,
         totalEpisodes: 327,
         progress: 0,
         image: supernatralist
@@ -66,7 +66,7 @@ const defaultMedia = [
         status: "want",
         watchDate: null,
         link: null,
-        // episodeDuration: 50,
+        episodeDuration: 50,
         totalEpisodes: 24,
         progress: 0,
         image: akusher
@@ -79,7 +79,7 @@ const defaultMedia = [
         status: "want",
         watchDate: null,
         link: null,
-        // episodeDuration: 45,
+        episodeDuration: 45,
         totalEpisodes: 22,
         progress: 0,
         image: ylichnoe
@@ -92,7 +92,7 @@ const defaultMedia = [
         status: "want",
         watchDate: null,
         link: null,
-        // episodeDuration: 50,
+        episodeDuration: 50,
         totalEpisodes: 7,
         progress: 0,
         image: topi

@@ -396,4 +396,70 @@ function handleDelete(id) {
   transform: translateY(-2px);
   box-shadow: 0 6px 18px rgba(26, 23, 44, 0.3);
 }
+
+@media (max-width: 768px) {
+  .home {
+    padding: 12px;
+  }
+
+  .stats {
+    gap: 10px;
+    justify-content: center;
+  }
+
+  .stat-card {
+    font-size: 14px;
+    padding: 6px 10px;
+  }
+
+  .suggestion {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 14px;
+    gap: 10px;
+  }
+
+  .suggestion-icon {
+    width: 92px;
+    height: 92px;
+    align-self: center;
+    border-radius: 14px;
+  }
+
+  .suggestion-card {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-left: 0;
+    margin-right: 0;
+    min-width: unset;
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .suggestion-poster {
+    width: 100%;
+    height: 220px;
+    border-radius: 12px;
+  }
+
+  .suggestion-info {
+    gap: 4px;
+    text-align: center;
+  }
+
+  .suggestion-info strong {
+    font-size: 17px;
+  }
+
+  .suggestion-info span {
+    font-size: 13px;
+  }
+
+  .btn-link {
+    width: 100%;
+    font-size: 14px;
+    padding: 10px;
+    margin-top: 6px;
+  }
+}
 </style>

@@ -64,15 +64,9 @@ const filteredMedia = computed(() => {
 <template>
   <div class="list">
     <div class="filters">
-      <button @click="typeFilter = 'all'" :class="{ active: typeFilter === 'all' }">
-        Все
-      </button>
-      <button @click="typeFilter = 'series'" :class="{ active: typeFilter === 'series' }">
-        Сериалы
-      </button>
-      <button @click="typeFilter = 'film'" :class="{ active: typeFilter === 'film' }">
-        Фильмы
-      </button>
+      <button @click="typeFilter = 'all'" :class="['type-btn', { active: typeFilter === 'all' }]">Все</button>
+      <button @click="typeFilter = 'series'" :class="['type-btn', { active: typeFilter === 'series' }]">Сериалы</button>
+      <button @click="typeFilter = 'film'" :class="['type-btn', { active: typeFilter === 'film' }]">Фильмы</button>
 
       <span class="separator"></span>
 
@@ -157,6 +151,25 @@ const filteredMedia = computed(() => {
   color: #1a172c;
   border-color: #fdb688;
 }
+
+.filters .type-btn {
+  background: #fefefe;
+  border: 1px solid #e8e8e8;
+}
+
+.filters .type-btn:hover {
+  background: #2d2a44;
+  border-color: #2d2a44;
+  color: #fefefe;
+}
+
+.filters .type-btn.active {
+  background: #1a172c;
+  color: #fefefe;
+  border: 1px solid #1a172c;
+}
+
+
 
 .separator {
   width: 1px;
@@ -248,5 +261,50 @@ const filteredMedia = computed(() => {
 
 .custom-select__option:hover {
   background: #fdeabf;
+}
+
+@media (max-width: 768px) {
+  .filters {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .filters button {
+    width: 100%;
+    text-align: center;
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .separator {
+    width: 100%;
+    height: 1px;
+    margin: 4px 0;
+  }
+
+  .custom-select {
+    width: 100%;
+  }
+
+  .custom-select__trigger {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .custom-select__option {
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+
+  .sort-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .grid {
+    gap: 10px;
+  }
 }
 </style>

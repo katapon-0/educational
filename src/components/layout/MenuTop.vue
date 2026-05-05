@@ -201,4 +201,50 @@ function closeEditModal() {
   transition: 0.2s ease;
 }
 
+@media (max-width: 768px) {
+  .topbar-inner {
+    width: 100%;
+    padding: 10px 12px;
+  }
+
+  .brand {
+    font-size: 16px;
+    gap: 6px;
+    padding: 4px 6px;
+  }
+
+  .logo {
+    width: 26px;
+    height: 20px;
+  }
+
+  .username {
+    display: none; 
+  }
+
+  .auth,
+  .user {
+    gap: 6px;
+  }
+
+  .btn {
+    padding: 5px 8px;
+    font-size: 13px;
+  }
+
+  .btn-accent {
+    padding: 6px 10px;
+  }
+
+  .icon-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .icon-img {
+    width: 28px;
+    height: 28px;
+  }
+}
+
 </style>

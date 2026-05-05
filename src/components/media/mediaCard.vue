@@ -185,29 +185,31 @@ function openDatePicker() { // https://developer.mozilla.org/en-US/docs/Web/API/
 
       <div class="buttons">
 
-        <button type="button" @click="open" class="btn-open">
+        <button type="button" @click="open" class="btn-open primary-mobile">
           Открыть
         </button>
 
-        <button type="button" @click="changeStatus('want')" class="status-btn">
-          Хочу
-        </button>
+        <div class="secondary-actions">
+          <button type="button" @click="changeStatus('want')" class="status-btn">
+            Хочу
+          </button>
 
-        <button type="button" @click="changeStatus('watching')" class="status-btn">
-          Смотрю
-        </button>
+          <button type="button" @click="changeStatus('watching')" class="status-btn">
+            Смотрю
+          </button>
 
-        <button type="button" @click="changeStatus('done')" class="status-btn">
-          Готово
-        </button>
+          <button type="button" @click="changeStatus('done')" class="status-btn">
+            Готово
+          </button>
 
-        <button type="button" @click="changeStatus('abandoned')" class="status-btn">
-          Заброшено
-        </button>
+          <button type="button" @click="changeStatus('abandoned')" class="status-btn">
+            Заброшено
+          </button>
 
-        <button type="button" @click="remove" class="btn-delete">
-          Удалить
-        </button>
+          <button type="button" @click="remove" class="btn-delete">
+            Удалить
+          </button>
+        </div>
 
       </div>
 
@@ -355,18 +357,22 @@ function openDatePicker() { // https://developer.mozilla.org/en-US/docs/Web/API/
 
 .buttons {
   display: flex;
-  gap: 6px;
   flex-wrap: wrap;
   justify-content: center;
-  margin-top: 8px;
+  align-items: flex-start;
+  gap: 0; /* убираем общий gap, теперь управляем через блоки */
+  margin-top: 12px;
 }
 
 .buttons button {
   border-radius: 999px;
   cursor: pointer;
   transition: all 0.2s ease;
+
   padding: 9px 26px;
   font-size: 17px;
+
+  margin: 2px; 
 }
 
 .btn-open {
@@ -423,5 +429,78 @@ function openDatePicker() { // https://developer.mozilla.org/en-US/docs/Web/API/
 .overdue-badge {
   color: #c36b65;
   font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .card {
+    flex-direction: column;
+    align-items: center;
+    padding: 12px;
+  }
+
+  .cover {
+    width: 100%;
+    max-width: 320px;
+    height: auto;
+    aspect-ratio: 2 / 3;
+  }
+
+  .info {
+    width: 100%;
+    padding: 10px 0;
+  }
+
+  .title {
+    font-size: 20px;
+  }
+
+  .type,
+  .status,
+  .meta {
+    font-size: 14px;
+  }
+
+  .custom-date-select {
+    width: 100%;
+    max-width: 280px;
+  }
+
+  .buttons {
+    width: 100%;
+    gap: 8px;
+  }
+
+  .buttons button {
+    flex: 1 1 45%;
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .progress-controls {
+    justify-content: center;
+  }
+
+  .primary-mobile {
+    width: 100%;
+    font-size: 16px;
+    padding: 12px;
+    border-radius: 14px;
+    margin-bottom: 10px;
+  }
+ 
+  .secondary-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .secondary-actions button {
+    flex: 1 1 45%;
+    font-size: 13px;
+    padding: 8px;
+    border-radius: 12px;
+  }
 }
 </style>

@@ -19,33 +19,39 @@ function validate() {
   errors.value = {}
   successMessage.value = ""
 
-  const name = form.value.name?.trim()
-  const login = form.value.login?.trim()
-  const password = form.value.password?.trim()
+  const login = form.value.login.trim()
+  const name = form.value.name.trim()
+  const password = form.value.password.trim()
 
-  if (!name) {
-    errors.value.name = "Введите имя"
-  }
-
+  // LOGIN
   if (!login) {
     errors.value.login = "Введите логин"
   } else if (login.length < 3) {
-    errors.value.login = "Логин слишком короткий"
+    errors.value.login = "Логин минимум 3 символа"
+  } else {
+    const exists = users.value.some(
+      u =>
+        u.login.toLowerCase() === login.toLowerCase() &&
+        u.id !== currentUser.value.id
+    )
+
+    if (exists) {
+      errors.value.login = "Такой логин уже существует"
+    }
   }
 
+  // NAME
+  if (!name) {
+    errors.value.name = "Введите имя"
+  } else if (name.length < 2) {
+    errors.value.name = "Имя слишком короткое"
+  }
+
+  // PASSWORD
   if (!password) {
     errors.value.password = "Введите пароль"
   } else if (password.length < 6) {
-    errors.value.password = "Пароль слишком короткий"
-  }
-
-  // проверка на уникальность логина (если поменяли)
-  const exists = users.value.find(
-    u => u.login === login && u.id !== currentUser.value.id
-  )
-
-  if (exists) {
-    errors.value.login = "Такой логин уже занят"
+    errors.value.password = "Пароль минимум 6 символов"
   }
 
   return Object.keys(errors.value).length === 0
@@ -211,5 +217,52 @@ input::placeholder {
   color: #1c9c3c;
   font-size: 13px;
   margin-top: 6px;
+}
+
+@media (max-width: 768px) {
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 18px 18px 0 0;
+    padding: 18px 14px 20px;
+    max-height: 92vh;
+    overflow-y: auto;
+  }
+
+  .modal h3 {
+    font-size: 18px;
+    text-align: center;
+  }
+
+  input {
+    font-size: 14px;
+    padding: 11px 12px;
+  }
+
+  .actions {
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .actions button {
+    width: 100%;
+    padding: 11px 14px;
+    font-size: 14px;
+  }
+
+  .error {
+    font-size: 11px;
+  }
+
+  .success {
+    font-size: 12px;
+    text-align: center;
+  }
 }
 </style>
