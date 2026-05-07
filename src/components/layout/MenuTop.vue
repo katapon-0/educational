@@ -59,7 +59,7 @@ function closeEditModal() {
 
       <div class="right">
         <div v-if="!isAuth" class="auth">
-          <button @click="goLogin" class="btn">Войти</button>
+          <button @click="goLogin" class="btn">Авторизация</button>
         </div>
         <div v-else class="user">
           <button class="icon-btn" @click="openEditModal" title="Профиль">
@@ -89,7 +89,7 @@ function closeEditModal() {
 }
 
 .topbar-inner {
-  width: 65vw;
+  width: 80vw;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;

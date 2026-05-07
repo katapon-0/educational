@@ -39,6 +39,13 @@ function selectSort(value) {
   showSortDropdown.value = false;
 }
 
+// сброс всех фильтров и сортировки к значениям по умолчанию
+function resetFilters() {
+  typeFilter.value = "all";
+  statusFilter.value = "all";
+  sortType.value = "date-asc";
+}
+
 const filteredMedia = computed(() => {
   let list = props.items;
   list = filterByType(list, typeFilter.value);
@@ -64,26 +71,57 @@ const filteredMedia = computed(() => {
 <template>
   <div class="list">
     <div class="filters">
-      <button @click="typeFilter = 'all'" :class="['type-btn', { active: typeFilter === 'all' }]">Все</button>
-      <button @click="typeFilter = 'series'" :class="['type-btn', { active: typeFilter === 'series' }]">Сериалы</button>
-      <button @click="typeFilter = 'film'" :class="['type-btn', { active: typeFilter === 'film' }]">Фильмы</button>
+      <button
+        @click="typeFilter = 'all'"
+        :class="['type-btn', { active: typeFilter === 'all' }]"
+      >
+        Все
+      </button>
+      <button
+        @click="typeFilter = 'series'"
+        :class="['type-btn', { active: typeFilter === 'series' }]"
+      >
+        Сериалы
+      </button>
+      <button
+        @click="typeFilter = 'film'"
+        :class="['type-btn', { active: typeFilter === 'film' }]"
+      >
+        Фильмы
+      </button>
 
       <span class="separator"></span>
 
-      <button @click="statusFilter = 'all'" :class="{ active: statusFilter === 'all' }">
-        Все статусы
+      <button
+        @click="statusFilter = 'all'"
+        :class="{ active: statusFilter === 'all' }"
+      >
+        Все
       </button>
-      <button v-for="st in statuses" :key="st" @click="statusFilter = st" :class="{ active: statusFilter === st }">
+      <button
+        v-for="st in statuses"
+        :key="st"
+        @click="statusFilter = st"
+        :class="{ active: statusFilter === st }"
+      >
         {{ statusLabels[st] }}
       </button>
 
       <span class="separator"></span>
 
       <!-- кастомный селект сортировки -->
-      <div class="custom-select" @click="toggleSortDropdown" ref="sortSelectRef">
+      <div
+        class="custom-select"
+        @click="toggleSortDropdown"
+        ref="sortSelectRef"
+      >
         <div class="custom-select__trigger">
           <span>
-            <img :src="sortType === 'overdue' ? iconWarning : iconCalendar" class="sort-icon" alt="sort" />
+            <img
+              :src="sortType === 'overdue' ? iconWarning : iconCalendar"
+              class="sort-icon"
+              alt="sort"
+            />
             {{
               sortType === "date-asc"
                 ? "Ближайшие"
@@ -96,20 +134,34 @@ const filteredMedia = computed(() => {
         </div>
         <div v-if="showSortDropdown" class="custom-select__options">
           <div class="custom-select__option" @click="selectSort('date-asc')">
-            <img :src="iconCalendar" class="sort-icon" alt="calendar" /> Ближайшие
+            <img :src="iconCalendar" class="sort-icon" alt="calendar" />
+            Ближайшие
           </div>
           <div class="custom-select__option" @click="selectSort('date-desc')">
             <img :src="iconCalendar" class="sort-icon" alt="calendar" /> Поздние
           </div>
           <div class="custom-select__option" @click="selectSort('overdue')">
-            <img :src="iconWarning" class="sort-icon" alt="warning" /> Просроченные
+            <img :src="iconWarning" class="sort-icon" alt="warning" />
+            Просроченные
           </div>
         </div>
       </div>
+      <div class="bottom-actions">
+        <button class="reset-btn-bottom" @click="resetFilters">
+          Сбросить
+        </button>
+      </div>
     </div>
 
+    <slot name="stats" />
+
     <div class="grid">
-      <MediaCard v-for="item in filteredMedia" :key="item.id" :item="item" @delete="emit('delete', item.id)" />
+      <MediaCard
+        v-for="item in filteredMedia"
+        :key="item.id"
+        :item="item"
+        @delete="emit('delete', item.id)"
+      />
     </div>
   </div>
 </template>
@@ -130,7 +182,7 @@ const filteredMedia = computed(() => {
 
 .filters button {
   font-family: var(--font-text);
-  padding: 6px 14px;
+  padding: 10px 14px;
   border: 1px solid #e0e0e0;
   border-radius: 20px;
 
@@ -259,6 +311,20 @@ const filteredMedia = computed(() => {
 
 .custom-select__option:hover {
   background: #fdeabf;
+}
+
+.reset-btn {
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  background: transparent;
+  color: #1a172c;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+.reset-btn:hover {
+  background: #fdeabf;
+  border-color: #fdb688;
 }
 
 @media (max-width: 768px) {
