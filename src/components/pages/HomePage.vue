@@ -33,16 +33,13 @@ function handleDelete(id) {
   <div class="home">
     <div v-if="!currentUser" class="guest">
       <div class="guest-card">
-
         <img src="../../assets/icons/name.png" class="guest-illustration" />
 
-        <h1 class="guest-title">
-          Ваш личный список просмотра
-        </h1>
+        <h1 class="guest-title">Ваш личный список просмотра</h1>
 
         <p class="guest-subtitle">
-          Сохраняйте фильмы и сериалы, отслеживайте прогресс и не забывайте,
-          что хотели посмотреть
+          Сохраняйте фильмы и сериалы, отслеживайте прогресс и не забывайте, что
+          хотели посмотреть
         </p>
 
         <div class="guest-actions">
@@ -50,45 +47,17 @@ function handleDelete(id) {
             Авторизоваться
           </button>
         </div>
-
       </div>
     </div>
 
-
-
     <div v-else>
-      <!-- Статистика -->
-      <div class="stats">
-        <div class="stat-card">
-          <img :src="iconWant" class="icon-emoji" alt="want" /> Хочу:
-          {{ stats.want }}
-        </div>
-
-        <div class="stat-card">
-          <img :src="iconWatching" class="icon-emoji" alt="watching" /> Смотрю:
-          {{ stats.watching }}
-        </div>
-
-        <div class="stat-card">
-          <img :src="iconDone" class="icon-emoji" alt="watching" /> Посмотрено:
-          {{ stats.done }}
-        </div>
-
-        <div class="stat-card">
-          <img :src="iconAbandoned" class="icon-emoji" alt="watching" /> Заброшено:
-          {{ stats.abandoned }}
-        </div>
-
-        <div class="stat-card">
-          <img :src="iconTotal" class="icon-emoji" alt="watching" /> Всего:
-          {{ stats.total }}
-        </div>
-
-      </div>
-
       <!-- Рекомендация -->
       <div class="suggestion">
-        <img src="../../assets/icons/suggetion.png" class="suggestion-icon" alt="icon" />
+        <img
+          src="../../assets/icons/suggetion.png"
+          class="suggestion-icon"
+          alt="icon"
+        />
         <button @click="refreshSuggestion" class="btn-suggestion">
           Что посмотреть ?
         </button>
@@ -98,28 +67,63 @@ function handleDelete(id) {
           <img :src="suggestion.image" class="suggestion-poster" />
           <div class="suggestion-info">
             <strong>{{ suggestion.title }}</strong>
-            <span>({{ suggestion.type === "series" ? "Сериал" : "Фильм" }})</span>
+            <span
+              >({{ suggestion.type === "series" ? "Сериал" : "Фильм" }})</span
+            >
             <span v-if="suggestion.watchDate">
               {{ new Date(suggestion.watchDate).toLocaleDateString() }}
             </span>
-            <button @click="router.push('/media/' + suggestion.id)" class="btn-link">
+            <button
+              @click="router.push('/media/' + suggestion.id)"
+              class="btn-link"
+            >
               Перейти
             </button>
           </div>
         </div>
 
         <!-- Сообщение об отсутствии вариантов -->
-        <p v-else-if="hasSuggestionRequested && !suggestion" class="empty-suggestion">
+        <p
+          v-else-if="hasSuggestionRequested && !suggestion"
+          class="empty-suggestion"
+        >
           Нет доступных вариантов
         </p>
       </div>
 
-      <hr class="divider" />
       <div v-if="!userMedia.length" class="empty-state">
         <p>У вас пока нет медиа 🎬</p>
         <p>Нажмите «+ Добавить» в шапке, чтобы начать</p>
       </div>
-      <MediaList v-else :items="userMedia" @delete="handleDelete" />
+      <MediaList v-else :items="userMedia" @delete="handleDelete">
+        <!-- статистика перенесена под фильтры -->
+        <template #stats>
+          <div class="stats">
+            <div class="stat-card">
+              <img :src="iconWant" class="icon-emoji" alt="want" /> Хочу:
+              {{ stats.want }}
+            </div>
+            <div class="stat-card">
+              <img :src="iconWatching" class="icon-emoji" alt="watching" />
+              Смотрю:
+              {{ stats.watching }}
+            </div>
+            <div class="stat-card">
+              <img :src="iconDone" class="icon-emoji" alt="done" /> Посмотрено:
+              {{ stats.done }}
+            </div>
+            <div class="stat-card">
+              <img :src="iconAbandoned" class="icon-emoji" alt="abandoned" />
+              Заброшено:
+              {{ stats.abandoned }}
+            </div>
+            <div class="stat-card">
+              <img :src="iconTotal" class="icon-emoji" alt="total" /> Всего:
+              {{ stats.total }}
+            </div>
+          </div>
+        </template>
+      </MediaList>
     </div>
   </div>
 </template>
@@ -172,7 +176,7 @@ function handleDelete(id) {
 .stat-card {
   background: #ffffff;
   padding: 8px 16px;
-  border-radius: 20px;
+  border-radius: 12px;
   border: 1px solid #e5e5e5;
   color: #1a172c;
 }
@@ -181,8 +185,7 @@ function handleDelete(id) {
   background: linear-gradient(135deg, #fdeabf 0%, #fdb688 100%);
   border-radius: 20px;
   padding: 16px;
-  margin-bottom: 20px;
-  box-shadow: 0 6px 20px rgba(26, 23, 44, 0.1);
+  margin: 25px 0 40px;
   display: flex;
   align-items: center;
   gap: 16px;
@@ -234,7 +237,9 @@ function handleDelete(id) {
   margin-left: 40px;
   margin-right: 80px;
 
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .suggestion-card:hover {
@@ -293,12 +298,6 @@ function handleDelete(id) {
 .btn-link:hover {
   opacity: 0.92;
   transform: translateY(-1px);
-}
-
-.divider {
-  border: none;
-  border-top: 1px solid #e5e5e5;
-  margin: 20px 0;
 }
 
 .empty-state {

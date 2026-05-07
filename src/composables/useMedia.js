@@ -72,7 +72,7 @@ function filterByStatus(list, status) {
 const statuses = ["want", "watching", "done", "abandoned"]
 
 const statusLabels = {
-    want: "Хочу посмотреть",
+    want: "Хочу",
     watching: "Смотрю",
     done: "Просмотрено",
     abandoned: "Заброшено"

@@ -174,7 +174,7 @@ function addMediaToUser(item) {
         image: item.image || null
     }
     // создаём новый массив, чтобы реактивность сработала
-    const newMedia = [...media, newItem]
+    const newMedia = [newItem, ...media]
     updateUserMedia(newMedia)
 }
 
