@@ -413,8 +413,19 @@ function markAsWatched() {
     </Teleport>
 
   </div>
-  <div v-else class="empty">
-    <p>Медиа не найдено</p>
+
+  <!-- Блок "ничего не найдено"  -->
+  <div v-else class="not-found">
+    <div class="content-notfound">
+      <h1 class="code">404</h1>
+      <p class="message">Медиа не найдено</p>
+      <p class="description">
+        Возможно, фильм или сериал был удалён, или неверно указан адрес.
+      </p>
+      <button @click="router.push({ name: 'home' })" class="btn-home">
+        Вернуться на главную
+      </button>
+    </div>
   </div>
 </template>
 
@@ -917,6 +928,59 @@ textarea {
   display: flex;
   justify-content: center;
   gap: 12px;
+}
+
+/* Стили для блока "не найдено" */
+.not-found {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  padding: 40px 20px;
+  background: #fefefe;
+  color: #1a172c;
+  font-family: var(--font-text, Arial, sans-serif);
+}
+
+.content-notfound {
+  display: flex;
+  flex-direction: column;
+  align-items: center;     /* горизонтальное центрирование */
+  text-align: center;
+  max-width: 500px;
+  gap: 16px;              /* равномерное расстояние между элементами */
+}
+
+.code {
+  font-size: 120px;
+  font-weight: 700;
+  color: #1a172c;
+  margin: 0;
+  line-height: 1;
+  font-family: var(--font-heading, Arial, sans-serif);
+}
+.message {
+  font-size: 28px;
+  font-weight: 600;
+  margin: 16px 0 8px;
+  color: #1a172c;
+}
+
+.btn-home {
+  background: #1a172c;
+  color: #fefefe;
+  border: none;
+  padding: 12px 32px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(26, 23, 44, 0.2);
+}
+.btn-home:hover {
+  background: #2d2a44;
+  transform: translateY(-2px);
 }
 
 @media (max-width: 768px) {
