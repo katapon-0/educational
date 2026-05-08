@@ -171,12 +171,11 @@ input::placeholder {
 
 .buttons {
   display: flex;
-  justify-content: stretch;
+  justify-content: center;
 }
 
 button {
   width: 100%;
-  max-width: 200px;
 
   border: none;
   background: #1a172c;
