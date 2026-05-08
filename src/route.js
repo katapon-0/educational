@@ -4,6 +4,8 @@ import HomePage from "./components/pages/HomePage.vue"
 import LoginPage from "./components/auth/LoginPage.vue"
 import RegisterForm from "./components/auth/RegisterForm.vue"
 import MediaPage from "./components/pages/MediaPage.vue"
+import NotFound from "./components/pages/NotFound.vue"
+
 
 // =========================
 // РОУТЫ
@@ -39,7 +41,8 @@ const routes = [
 
   {
     path: "/:pathMatch(.*)*",
-    redirect: "/"
+    name: 'NotFound',
+    component: NotFound
   }
 ]
 
