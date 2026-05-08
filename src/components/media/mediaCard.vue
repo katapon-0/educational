@@ -1,127 +1,152 @@
 <script setup>
-import { computed, ref } from "vue"
-import { useRouter } from "vue-router"
-import { useMedia } from "../../composables/useMedia"
+import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
+import { useMedia } from "../../composables/useMedia";
 
 const props = defineProps({
   item: {
     type: Object,
     required: true,
   },
-})
+});
 
-const emit = defineEmits(["delete"])
+const emit = defineEmits(["delete"]);
 
-const router = useRouter()
-const { updateStatus, statusLabels, increaseProgress, updateMedia, setWatchDate } = useMedia()
+const router = useRouter();
+const {
+  updateStatus,
+  statusLabels,
+  increaseProgress,
+  updateMedia,
+  setWatchDate,
+} = useMedia();
 
 // мы проверяем,это серик или фильм
-const isSeries = computed(() => props.item.type === "series")
+const isSeries = computed(() => props.item.type === "series");
 
-const statusLabel = computed(() => statusLabels[props.item.status] ?? props.item.status)
+const statusLabel = computed(
+  () => statusLabels[props.item.status] ?? props.item.status,
+);
 
-const currentProgress = computed(() => props.item.progress ?? 0)
+const currentProgress = computed(() => props.item.progress ?? 0);
 
-const totalEpisodes = computed(() => props.item.totalEpisodes ?? null)
+const totalEpisodes = computed(() => props.item.totalEpisodes ?? null);
 
 const progressText = computed(() => {
-  if (!isSeries.value) return ""
-  return `${currentProgress.value} / ${totalEpisodes.value ?? "?"}`
-})
+  if (!isSeries.value) return "";
+  return `${currentProgress.value} / ${totalEpisodes.value ?? "?"}`;
+});
 
 //можно ли увеличить прогресс
 const canIncreaseProgress = computed(() => {
-  if (!isSeries.value) return false //если это не сериал-> нельзя
-  if (!totalEpisodes.value) return true //если хз скок серий -> можно
-  return currentProgress.value < totalEpisodes.value //если ещё не достигли конца -> моэно
-})
+  if (!isSeries.value) return false; //если это не сериал-> нельзя
+  if (!totalEpisodes.value) return true; //если хз скок серий -> можно
+  return currentProgress.value < totalEpisodes.value; //если ещё не достигли конца -> моэно
+});
 
 //просрочено ли?
 const isOverdue = computed(() => {
-  if (!props.item.watchDate) return false //если нет даиы просмотра-> не просрочено 
-  if (props.item.status === "done" || props.item.status === "abandoned") return false //если отмечено как просмотрено или заброшено, -> не просрочено 
+  if (!props.item.watchDate) return false; //если нет даиы просмотра-> не просрочено
+  if (props.item.status === "done" || props.item.status === "abandoned")
+    return false; //если отмечено как просмотрено или заброшено, -> не просрочено
 
-  const today = new Date() //берем сегодняшнюю дату
-  today.setHours(0, 0, 0, 0) //обнуляем время
+  const today = new Date(); //берем сегодняшнюю дату
+  today.setHours(0, 0, 0, 0); //обнуляем время
 
-  const watchDate = new Date(props.item.watchDate) //превращаем дату просмотра в тип date
-  watchDate.setHours(0, 0, 0, 0) //обнуляем
+  const watchDate = new Date(props.item.watchDate); //превращаем дату просмотра в тип date
+  watchDate.setHours(0, 0, 0, 0); //обнуляем
 
-  return watchDate < today //если дата просмотра меньше сегодняшней даты -> просрочено
-})
+  return watchDate < today; //если дата просмотра меньше сегодняшней даты -> просрочено
+});
 
 //дата добавления
 const formattedDateAdded = computed(() =>
   props.item.dateAdded
     ? new Date(props.item.dateAdded).toLocaleDateString("ru-RU")
-    : ""
-)
+    : "",
+);
 
 function open() {
   router.push({
     name: "media",
-    params: { id: props.item.id }
-  })
+    params: { id: props.item.id },
+  });
 }
 
 function remove() {
-  emit("delete", props.item.id)
+  emit("delete", props.item.id);
 }
 
 function changeStatus(status) {
-  updateStatus(props.item.id, status)
+  updateStatus(props.item.id, status);
 }
 
 //увеличить прогресс
 function incProgress() {
-  if (!isSeries.value || !canIncreaseProgress.value) return //если это не сериал и нельзя увеличивать -> нельзя
-  increaseProgress(props.item.id) //иначе разрешаем
+  if (!isSeries.value || !canIncreaseProgress.value) return; //если это не сериал и нельзя увеличивать -> нельзя
+  increaseProgress(props.item.id); //иначе разрешаем
 }
 
 //уменьшить прогресс
 function decProgress() {
-  if (!isSeries.value) return //если это не сериал -> нельзя
+  if (!isSeries.value) return; //если это не сериал -> нельзя
 
-  const newProgress = Math.max((props.item.progress ?? 0) - 1, 0) //уменьшаем на единичку, но ограничиваем чтобы нельзя было опустить ниже нуля
-  updateMedia(props.item.id, { progress: newProgress })
+  const newProgress = Math.max((props.item.progress ?? 0) - 1, 0); //уменьшаем на единичку, но ограничиваем чтобы нельзя было опустить ниже нуля
+  updateMedia(props.item.id, { progress: newProgress });
 
   if (newProgress === 0) {
-    updateStatus(props.item.id, "want") //если прогресс 0, кидаем в статус "хочу посмотреть"
+    updateStatus(props.item.id, "want"); //если прогресс 0, кидаем в статус "хочу посмотреть"
   }
 }
 
 // обработчик смены даты из кастомного селекта
 function onWatchDateChange(event) {
-  const date = event.target.value || null
-  setWatchDate(props.item.id, date)
+  const date = event.target.value || null;
+  setWatchDate(props.item.id, date);
 }
 
 const progressPercent = computed(() => {
-  if (!isSeries.value) return 0
+  if (!isSeries.value) return 0;
 
-  const total = totalEpisodes.value
-  const current = currentProgress.value
+  const total = totalEpisodes.value;
+  const current = currentProgress.value;
 
-  if (!total || total === 0) return 0
+  if (!total || total === 0) return 0;
 
-  return Math.min((current / total) * 100, 100)
-})
+  return Math.min((current / total) * 100, 100);
+});
 
 //для фикса нажатия календаря
-const dateInput = ref(null) //по умолчанию нулл, потом загрузится другое значение
+const dateInput = ref(null); //по умолчанию нулл, потом загрузится другое значение
 
-function openDatePicker() { // https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement 
-  if (!dateInput.value) return //чтобы не ругался что dateinput каннот рид пропертдис оф нулл
-  //если простыми словами,шоупикер это команда "открой это"
-  if (dateInput.value.showPicker) { //если шоу пикер поддерживается в браузере
-    dateInput.value.showPicker() //нажать
-  } else {
-    dateInput.value.focus() //навести на календарь
-    dateInput.value.click() //кликнуть
-  }
+// модальное окно подтверждения удаления
+const showDeleteConfirm = ref(false);
+
+function requestDelete() {
+  showDeleteConfirm.value = true;
 }
 
+function confirmDelete() {
+  showDeleteConfirm.value = false;
+  emit("delete", props.item.id);
+}
 
+function cancelDelete() {
+  showDeleteConfirm.value = false;
+}
+
+function openDatePicker() {
+  // https://developer.mozilla.org/en-US/docs/Web/API/HTMLInputElement
+  if (!dateInput.value) return; //чтобы не ругался что dateinput каннот рид пропертдис оф нулл
+  //если простыми словами,шоупикер это команда "открой это"
+  if (dateInput.value.showPicker) {
+    //если шоу пикер поддерживается в браузере
+    dateInput.value.showPicker(); //нажать
+  } else {
+    dateInput.value.focus(); //навести на календарь
+    dateInput.value.click(); //кликнуть
+  }
+}
 </script>
 
 <template>
@@ -129,7 +154,6 @@ function openDatePicker() { // https://developer.mozilla.org/en-US/docs/Web/API/
     <img :src="item.image" :alt="item.title" class="cover" />
 
     <div class="info">
-
       <h3 class="title">{{ item.title }}</h3>
 
       <p class="type">{{ isSeries ? "Сериал" : "Фильм" }}</p>
@@ -141,28 +165,37 @@ function openDatePicker() { // https://developer.mozilla.org/en-US/docs/Web/API/
       </p>
 
       <!-- кастомный селект даты просмотра (как фильтры) -->
-      <div v-if="item.status !== 'done' && item.status !== 'abandoned'" class="date-picker">
+      <div
+        v-if="item.status !== 'done' && item.status !== 'abandoned'"
+        class="date-picker"
+      >
         <label class="meta">Назначить дату просмотра:</label>
 
         <div class="custom-date-select" @click="openDatePicker">
           <img src="../../assets/icons/calendar.png" class="calendar-icon" />
           <span class="selected-date">
-            {{ item.watchDate ? new Date(item.watchDate).toLocaleDateString("ru-RU") : "Не выбрана" }}
+            {{
+              item.watchDate
+                ? new Date(item.watchDate).toLocaleDateString("ru-RU")
+                : "Не выбрана"
+            }}
           </span>
           <span class="custom-select__arrow">▼</span>
 
           <!-- скрытый нативный input, перекрывает всю обёртку и открывает календарь -->
-          <input ref="dateInput" type="date" :value="item.watchDate ?? ''" @change="onWatchDateChange"
-            class="hidden-date-input" />
+          <input
+            ref="dateInput"
+            type="date"
+            :value="item.watchDate ?? ''"
+            @change="onWatchDateChange"
+            class="hidden-date-input"
+          />
         </div>
-        <p v-if="isOverdue" class="badge overdue-badge">Просрочено :-( </p>
+        <p v-if="isOverdue" class="badge overdue-badge">Просрочено :-(</p>
       </div>
 
       <div v-if="isSeries" class="progress">
-
-        <p class="meta">
-          Прогресс: {{ progressText }}
-        </p>
+        <p class="meta">Прогресс: {{ progressText }}</p>
 
         <div class="progress-bar">
           <div class="fill" :style="{ width: progressPercent + '%' }"></div>
@@ -173,7 +206,12 @@ function openDatePicker() { // https://developer.mozilla.org/en-US/docs/Web/API/
             –
           </button>
 
-          <button type="button" class="progress-btn" :disabled="!canIncreaseProgress" @click="incProgress">
+          <button
+            type="button"
+            class="progress-btn"
+            :disabled="!canIncreaseProgress"
+            @click="incProgress"
+          >
             +
           </button>
         </div>
@@ -184,37 +222,72 @@ function openDatePicker() { // https://developer.mozilla.org/en-US/docs/Web/API/
       </p>
 
       <div class="buttons">
-
         <button type="button" @click="open" class="btn-open primary-mobile">
           Открыть
         </button>
 
         <div class="secondary-actions">
-          <button type="button" @click="changeStatus('want')" class="status-btn">
+          <button
+            type="button"
+            @click="changeStatus('want')"
+            class="status-btn"
+          >
             Хочу
           </button>
 
-          <button type="button" @click="changeStatus('watching')" class="status-btn">
+          <button
+            type="button"
+            @click="changeStatus('watching')"
+            class="status-btn"
+          >
             Смотрю
           </button>
 
-          <button type="button" @click="changeStatus('done')" class="status-btn">
+          <button
+            type="button"
+            @click="changeStatus('done')"
+            class="status-btn"
+          >
             Готово
           </button>
 
-          <button type="button" @click="changeStatus('abandoned')" class="status-btn">
+          <button
+            type="button"
+            @click="changeStatus('abandoned')"
+            class="status-btn"
+          >
             Заброшено
           </button>
 
-          <button type="button" @click="remove" class="btn-delete">
+          <button type="button" @click="requestDelete" class="btn-delete">
             Удалить
           </button>
         </div>
-
       </div>
-
     </div>
   </article>
+  <!--  модальное окно подтверждения удаления -->
+  <Teleport to="body">
+    <div
+      v-if="showDeleteConfirm"
+      class="confirm-overlay"
+      @click.self="cancelDelete"
+    >
+      <div class="confirm-modal">
+        <h3>Удаление медиа</h3>
+        <p>
+          Вы точно хотите удалить <strong>{{ item.title }}</strong
+          >?
+        </p>
+        <div class="confirm-actions">
+          <button type="button" class="btn-delete" @click="confirmDelete">Удалить</button>
+          <button type="button" class="status-btn" @click="cancelDelete">
+            Отмена
+          </button>
+        </div>
+      </div>
+    </div>
+  </Teleport>
 </template>
 
 <style scoped>
@@ -302,7 +375,9 @@ function openDatePicker() { // https://developer.mozilla.org/en-US/docs/Web/API/
   border-radius: 20px;
   background: #fefefe;
   cursor: pointer;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
   position: relative;
   width: 220px;
   justify-content: space-between;
@@ -372,7 +447,7 @@ function openDatePicker() { // https://developer.mozilla.org/en-US/docs/Web/API/
   padding: 9px 26px;
   font-size: 17px;
 
-  margin: 2px; 
+  margin: 2px;
 }
 
 .btn-open {
@@ -431,6 +506,51 @@ function openDatePicker() { // https://developer.mozilla.org/en-US/docs/Web/API/
   font-weight: 600;
 }
 
+/* стили для модального окна подтверждения */
+.confirm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(26, 23, 44, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(4px);
+}
+
+.confirm-modal {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 24px;
+  max-width: 360px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(26, 23, 44, 0.2);
+}
+
+.confirm-modal h3 {
+  margin: 12px 0 12px;
+  color: #1a172c;
+  font-size: 20px;
+}
+
+.confirm-modal p {
+  margin: 0 0 24px;
+  color: #333;
+  font-size: 15px;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+
+
 @media (max-width: 768px) {
   .card {
     flex-direction: column;
@@ -487,7 +607,7 @@ function openDatePicker() { // https://developer.mozilla.org/en-US/docs/Web/API/
     border-radius: 14px;
     margin-bottom: 10px;
   }
- 
+
   .secondary-actions {
     display: flex;
     flex-wrap: wrap;

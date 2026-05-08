@@ -28,6 +28,9 @@ function validate() {
     errors.value.login = "Введите логин"
   } else if (login.length < 3) {
     errors.value.login = "Логин минимум 3 символа"
+  } else if (/\s/.test(login)) {
+    // запрещаем пробелы внутри логина
+    errors.value.login = "Логин не должен содержать пробелы"
   } else {
     const exists = users.value.some(
       u =>
@@ -45,6 +48,9 @@ function validate() {
     errors.value.name = "Введите имя"
   } else if (name.length < 2) {
     errors.value.name = "Имя слишком короткое"
+  } else if (/\s/.test(name)) {
+    // запрещаем пробелы внутри имени
+    errors.value.name = "Имя не должно содержать пробелы"
   }
 
   // PASSWORD
@@ -52,6 +58,9 @@ function validate() {
     errors.value.password = "Введите пароль"
   } else if (password.length < 6) {
     errors.value.password = "Пароль минимум 6 символов"
+  } else if (/\s/.test(password)) {
+    // запрещаем пробелы внутри пароля
+    errors.value.password = "Пароль не должен содержать пробелы"
   }
 
   return Object.keys(errors.value).length === 0

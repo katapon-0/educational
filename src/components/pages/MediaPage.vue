@@ -214,10 +214,22 @@ function handleDecreaseProgress() {
 // =========================
 // УДАЛЕНИЕ
 // =========================
-function remove() {
-  if (!item.value) return;
-  deleteMedia(item.value.id);
-  router.push({ name: "home" });
+// модальное окно подтверждения удаления
+const showDeleteConfirm = ref(false)
+
+function requestDelete() {
+  showDeleteConfirm.value = true
+}
+
+function confirmDelete() {
+  showDeleteConfirm.value = false
+  if (!item.value) return
+  deleteMedia(item.value.id)
+  router.push({ name: "home" })
+}
+
+function cancelDelete() {
+  showDeleteConfirm.value = false
 }
 
 // =========================
@@ -292,7 +304,8 @@ function markAsWatched() {
         </button>
 
         <button class="btn accent" @click="startEdit">Редактировать</button>
-        <button class="btn danger" @click="remove">Удалить</button>
+        <!-- кнопка удаления открывает модальное окно -->
+        <button class="btn danger" @click="requestDelete">Удалить</button>
 
       </div>
     </div>
@@ -383,6 +396,22 @@ function markAsWatched() {
         </div>
       </div>
     </div>
+
+
+        <!-- модальное окно подтверждения удаления -->
+    <Teleport to="body">
+      <div v-if="showDeleteConfirm" class="confirm-overlay" @click.self="cancelDelete">
+        <div class="confirm-modal">
+          <h3>Удаление медиа</h3>
+          <p>Вы точно хотите удалить <strong>{{ item.title }}</strong>?</p>
+          <div class="confirm-actions">
+            <button class="btn danger" @click="confirmDelete">Удалить</button>
+            <button class="btn accent" @click="cancelDelete">Отмена</button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
   </div>
   <div v-else class="empty">
     <p>Медиа не найдено</p>
@@ -845,6 +874,49 @@ textarea {
 .neutral:hover {
   background: #fdeabf;
   border-color: #fdb688;
+}
+
+/* стили для модального окна подтверждения */
+.confirm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(26, 23, 44, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(4px);
+}
+
+.confirm-modal {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 24px;
+  max-width: 360px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(26, 23, 44, 0.2);
+}
+
+.confirm-modal h3 {
+  margin: 12px 0 12px;
+  color: #1a172c;
+  font-size: 20px;
+}
+
+.confirm-modal p {
+  margin: 0 0 24px;
+  color: #333;
+  font-size: 15px;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
 }
 
 @media (max-width: 768px) {

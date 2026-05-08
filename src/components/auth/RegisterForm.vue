@@ -1,71 +1,78 @@
 <script setup>
-import { ref } from "vue"
-import { useRouter } from "vue-router"
-import { useUsers } from "../../composables/useUsers"
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { useUsers } from "../../composables/useUsers";
 
-const router = useRouter()
-const { register, users } = useUsers()
+const router = useRouter();
+const { register, users } = useUsers();
 
 const form = ref({
   login: "",
   name: "",
-  password: ""
-})
+  password: "",
+});
 
-const errors = ref({})
-
+const errors = ref({});
 
 function validate() {
-  errors.value = {}
+  errors.value = {};
 
-  const login = form.value.login.trim()
-  const name = form.value.name.trim()
-  const password = form.value.password.trim()
+  const login = form.value.login.trim();
+  const name = form.value.name.trim();
+  const password = form.value.password.trim();
 
   if (!login) {
-    errors.value.login = "Введите логин"
+    errors.value.login = "Введите логин";
   } else if (login.length < 3) {
-    errors.value.login = "Логин минимум 3 символа"
+    errors.value.login = "Логин минимум 3 символа";
+  } else if (/\s/.test(login)) {
+    // запрещаем пробелы внутри логина
+    errors.value.login = "Логин не должен содержать пробелы";
   } else {
     // проверка уникальности логина
     const exists = users.value.some(
-      u => u.login.toLowerCase() === login.toLowerCase()
-    )
+      (u) => u.login.toLowerCase() === login.toLowerCase(),
+    );
 
     if (exists) {
-      errors.value.login = "Такой логин уже существует"
+      errors.value.login = "Такой логин уже существует";
     }
   }
 
   if (!name) {
-    errors.value.name = "Введите имя"
+    errors.value.name = "Введите имя";
   } else if (name.length < 2) {
-    errors.value.name = "Имя слишком короткое"
+    errors.value.name = "Имя слишком короткое";
+  } else if (/\s/.test(name)) {
+    // запрещаем пробелы внутри имени
+    errors.value.name = "Имя не должно содержать пробелы"
   }
 
   if (!password) {
-    errors.value.password = "Введите пароль"
+    errors.value.password = "Введите пароль";
   } else if (password.length < 6) {
-    errors.value.password = "Пароль минимум 6 символов"
+    errors.value.password = "Пароль минимум 6 символов";
+  } else if (/\s/.test(password)) {
+    // запрещаем пробелы внутри пароля
+    errors.value.password = "Пароль не должен содержать пробелы"
   }
 
-  return Object.keys(errors.value).length === 0
+  return Object.keys(errors.value).length === 0;
 }
-
 
 function submit() {
   // проверка формы перед отправкой
-  if (!validate()) return
+  if (!validate()) return;
 
   const success = register({
     login: form.value.login.trim(),
     name: form.value.name.trim(),
-    password: form.value.password.trim()
-  })
+    password: form.value.password.trim(),
+  });
 
   if (!success) {
-    errors.value.login = "Ошибка регистрации"
-    return
+    errors.value.login = "Ошибка регистрации";
+    return;
   }
 
   router.push({ name: "home" });
@@ -77,7 +84,6 @@ function submit() {
     <h2>Регистрация</h2>
 
     <form class="form" @submit.prevent="submit">
-
       <div class="field">
         <input v-model="form.login" placeholder="Логин" />
         <p v-if="errors.login" class="error">{{ errors.login }}</p>
@@ -98,11 +104,8 @@ function submit() {
       </p>
 
       <div class="buttons">
-        <button type="submit">
-          Зарегистрироваться
-        </button>
+        <button type="submit">Зарегистрироваться</button>
       </div>
-
     </form>
   </div>
 </template>

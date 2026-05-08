@@ -22,10 +22,16 @@ function validate() {
 
   if (!loginVal) {
     errors.value.login = "Введите логин"
+  } else if (/\s/.test(loginVal)) {
+    // запрещаем пробелы внутри логина
+    errors.value.login = "Логин не должен содержать пробелы"
   }
 
   if (!passwordVal) {
     errors.value.password = "Введите пароль"
+  } else if (/\s/.test(passwordVal)) {
+    // запрещаем пробелы внутри пароля
+    errors.value.password = "Пароль не должен содержать пробелы"
   }
 
   return Object.keys(errors.value).length === 0
