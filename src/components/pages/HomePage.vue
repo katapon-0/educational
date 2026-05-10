@@ -53,11 +53,7 @@ function handleDelete(id) {
     <div v-else>
       <!-- Рекомендация -->
       <div class="suggestion">
-        <img
-          src="../../assets/icons/suggetion.png"
-          class="suggestion-icon"
-          alt="icon"
-        />
+        <img src="../../assets/icons/suggetion.png" class="suggestion-icon" alt="icon" />
         <button @click="refreshSuggestion" class="btn-suggestion">
           Что посмотреть ?
         </button>
@@ -67,26 +63,18 @@ function handleDelete(id) {
           <img :src="suggestion.image" class="suggestion-poster" />
           <div class="suggestion-info">
             <strong>{{ suggestion.title }}</strong>
-            <span
-              >({{ suggestion.type === "series" ? "Сериал" : "Фильм" }})</span
-            >
+            <span>({{ suggestion.type === "series" ? "Сериал" : "Фильм" }})</span>
             <span v-if="suggestion.watchDate">
               {{ new Date(suggestion.watchDate).toLocaleDateString() }}
             </span>
-            <button
-              @click="router.push('/media/' + suggestion.id)"
-              class="btn-link"
-            >
+            <button @click="router.push('/media/' + suggestion.id)" class="btn-link">
               Перейти
             </button>
           </div>
         </div>
 
         <!-- Сообщение об отсутствии вариантов -->
-        <p
-          v-else-if="hasSuggestionRequested && !suggestion"
-          class="empty-suggestion"
-        >
+        <p v-else-if="hasSuggestionRequested && !suggestion" class="empty-suggestion">
           Нет доступных вариантов
         </p>
       </div>
@@ -250,7 +238,7 @@ function handleDelete(id) {
 
 .suggestion-poster {
   width: 90px;
-  height: 130px;
+  height: 116px;
   object-fit: cover;
   border-radius: 12px;
   background: #fdeabf;

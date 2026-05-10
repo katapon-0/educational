@@ -79,12 +79,45 @@ function remove() {
 
 function changeStatus(status) {
   updateStatus(props.item.id, status);
+
+  if (status === "want") {
+    updateMedia(props.item.id, { progress: 0 });
+  }
+
+  if (status === "done") {
+    updateMedia(props.item.id, {
+      progress: totalEpisodes.value ?? props.item.progress,
+    });
+  }
+}
+
+function syncStatusWithProgress(progress) {
+  const total = totalEpisodes.value;
+
+  if (progress === 0) {
+    return "want";
+  }
+
+  if (total && progress >= total) {
+    return "done";
+  }
+
+  return "watching";
 }
 
 //увеличить прогресс
 function incProgress() {
-  if (!isSeries.value || !canIncreaseProgress.value) return; //если это не сериал и нельзя увеличивать -> нельзя
-  increaseProgress(props.item.id); //иначе разрешаем
+  if (!isSeries.value || !canIncreaseProgress.value) return;
+
+  const newProgress = (props.item.progress ?? 0) + 1;
+
+  const newStatus = syncStatusWithProgress(newProgress);
+
+  updateMedia(props.item.id, {
+    progress: newProgress,
+  });
+
+  updateStatus(props.item.id, newStatus);
 }
 
 //уменьшить прогресс
@@ -92,11 +125,14 @@ function decProgress() {
   if (!isSeries.value) return; //если это не сериал -> нельзя
 
   const newProgress = Math.max((props.item.progress ?? 0) - 1, 0); //уменьшаем на единичку, но ограничиваем чтобы нельзя было опустить ниже нуля
-  updateMedia(props.item.id, { progress: newProgress });
 
-  if (newProgress === 0) {
-    updateStatus(props.item.id, "want"); //если прогресс 0, кидаем в статус "хочу посмотреть"
-  }
+  const newStatus = syncStatusWithProgress(newProgress);
+
+  updateMedia(props.item.id, {
+    progress: newProgress,
+  });
+
+  updateStatus(props.item.id, newStatus);
 }
 
 // обработчик смены даты из кастомного селекта
@@ -168,22 +204,24 @@ function openDatePicker() {
       <div v-if="item.status !== 'done' && item.status !== 'abandoned'" class="date-picker">
         <label class="meta">Назначить дату просмотра:</label>
 
-        <div class="custom-date-select" @click="openDatePicker">
-          <img src="../../assets/icons/calendar.png" class="calendar-icon" />
-          <span class="selected-date">
-            {{
-              item.watchDate
-                ? new Date(item.watchDate).toLocaleDateString("ru-RU")
-                : "Не выбрана"
-            }}
-          </span>
-          <span class="custom-select__arrow">▼</span>
+        <div class="date-row">
+          <div class="custom-date-select" @click="openDatePicker">
+            <img src="../../assets/icons/calendar.png" class="calendar-icon" />
+            <span class="selected-date">
+              {{
+                item.watchDate
+                  ? new Date(item.watchDate).toLocaleDateString("ru-RU")
+                  : "Не выбрана"
+              }}
+            </span>
+            <span class="custom-select__arrow">▼</span>
 
-          <!-- скрытый нативный input, перекрывает всю обёртку и открывает календарь -->
-          <input ref="dateInput" type="date" :value="item.watchDate ?? ''" @change="onWatchDateChange"
-            class="hidden-date-input" />
+            <input ref="dateInput" type="date" :value="item.watchDate ?? ''" @change="onWatchDateChange"
+              class="hidden-date-input" />
+          </div>
+
+          <p v-if="isOverdue" class="badge overdue-badge">Просрочено :-(</p>
         </div>
-        <p v-if="isOverdue" class="badge overdue-badge">Просрочено :-(</p>
       </div>
 
       <div v-if="isSeries" class="progress">
@@ -194,11 +232,9 @@ function openDatePicker() {
         </div>
 
         <div class="progress-controls">
-          <button type="button" class="progress-btn" @click="decProgress">
-            –
-          </button>
+          <button class="btn round neutral" @click="decProgress">–</button>
 
-          <button type="button" class="progress-btn" :disabled="!canIncreaseProgress" @click="incProgress">
+          <button class="btn round dark" @click="incProgress" :disabled="!canIncreaseProgress">
             +
           </button>
         </div>
@@ -209,36 +245,39 @@ function openDatePicker() {
       </p>
 
       <div class="buttons">
-        <button type="button" @click="open" class="btn-open primary-mobile">
+        <!-- Открыть -->
+        <button type="button" @click="open" class="btn dark primary-mobile">
           Открыть
         </button>
 
+        <!-- статусы -->
         <div class="secondary-actions">
-          <button type="button" @click="changeStatus('want')" class="status-btn">
+          <button type="button" @click="changeStatus('want')" class="btn neutral">
             Хочу
           </button>
 
-          <button type="button" @click="changeStatus('watching')" class="status-btn">
+          <button type="button" @click="changeStatus('watching')" class="btn neutral">
             Смотрю
           </button>
 
-          <button type="button" @click="changeStatus('done')" class="status-btn">
+          <button type="button" @click="changeStatus('done')" class="btn neutral">
             Готово
           </button>
 
-          <button type="button" @click="changeStatus('abandoned')" class="status-btn">
+          <button type="button" @click="changeStatus('abandoned')" class="btn neutral">
             Заброшено
           </button>
 
-          <button type="button" @click="requestDelete" class="btn-delete">
+          <!-- удалить -->
+          <button type="button" @click="requestDelete" class="btn danger">
             Удалить
           </button>
         </div>
       </div>
     </div>
   </article>
+
   <!--  модальное окно подтверждения удаления -->
-  <!-- модальное окно подтверждения удаления -->
   <Teleport to="body">
     <div v-if="showDeleteConfirm" class="confirm-overlay" @click.self="cancelDelete">
       <div class="confirm-modal">
@@ -336,6 +375,14 @@ function openDatePicker() {
   color: #666;
 }
 
+.date-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .custom-date-select {
   display: flex;
   align-items: center;
@@ -375,17 +422,14 @@ function openDatePicker() {
   color: #999;
 }
 
-/* скрытый нативный инпут, перекрывает всю обёртку, открывает календарь */
 .hidden-date-input {
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
   opacity: 0;
   cursor: pointer;
   z-index: 10;
-  pointer-events: none;
 }
 
 .progress {
@@ -421,63 +465,17 @@ function openDatePicker() {
   margin: 2px;
 }
 
-.btn-open {
-  background: #1a172c;
-  color: #fefefe;
-  border: 1px solid #1a172c;
-}
-
-.btn-open:hover {
-  opacity: 0.92;
-}
-
-.status-btn {
-  background: #fefefe;
-  color: #1a172c;
-  border: 1px solid #dcdcdc;
-}
-
-.status-btn:hover {
-  background: #fdeabf;
-  border-color: #fdb688;
-}
-
-.btn-delete {
-  background: #fefefe;
-  color: #1a172c;
-  border: 1px solid #dcdcdc;
-}
-
-.btn-delete:hover {
-  background: #c36b65;
-  border-color: #8b2424;
-  color: #fff;
-}
-
-.progress-btn {
-  border: 1px solid #dcdcdc;
-  padding: 2px 10px;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background: #1a172c;
-}
-
-.progress-btn:hover:not(:disabled) {
-  background: #fdb688;
-}
-
-.progress-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
 
 .overdue-badge {
   color: #c36b65;
   font-weight: 600;
+  margin: 0;
+  padding: 4px 10px;
+  font-size: 13px;
+  line-height: 1;
+  white-space: nowrap;
 }
 
-/* 1:1 стили модального окна как в mediapage.vue */
 .confirm-overlay {
   position: fixed;
   top: 0;
@@ -631,5 +629,50 @@ function openDatePicker() {
     padding: 8px;
     border-radius: 12px;
   }
+}
+
+.dark {
+  background: #1a172c;
+  color: #fefefe;
+  border: 1px solid #1a172c;
+}
+
+.dark:hover {
+  background: #2d2a44;
+}
+
+.accent {
+  background: #fdb688;
+  color: #1a172c;
+  border: none;
+}
+
+.accent:hover {
+  background: #fdeabf;
+}
+
+.neutral {
+  background: #fefefe;
+  color: #1a172c;
+  border: 1px solid #e5e5e5;
+}
+
+.neutral:hover {
+  background: #fdeabf;
+  border-color: #fdb688;
+}
+
+.round {
+  width: 38px;
+  height: 38px;
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 999px;
+  line-height: 1;
+  font-size: 18px;
 }
 </style>

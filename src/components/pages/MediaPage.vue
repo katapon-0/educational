@@ -607,8 +607,7 @@ function markAsWatched() {
 }
 
 .dark:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
+  background: #2d2a44;
 }
 
 .accent {
