@@ -165,10 +165,7 @@ function openDatePicker() {
       </p>
 
       <!-- кастомный селект даты просмотра (как фильтры) -->
-      <div
-        v-if="item.status !== 'done' && item.status !== 'abandoned'"
-        class="date-picker"
-      >
+      <div v-if="item.status !== 'done' && item.status !== 'abandoned'" class="date-picker">
         <label class="meta">Назначить дату просмотра:</label>
 
         <div class="custom-date-select" @click="openDatePicker">
@@ -183,13 +180,8 @@ function openDatePicker() {
           <span class="custom-select__arrow">▼</span>
 
           <!-- скрытый нативный input, перекрывает всю обёртку и открывает календарь -->
-          <input
-            ref="dateInput"
-            type="date"
-            :value="item.watchDate ?? ''"
-            @change="onWatchDateChange"
-            class="hidden-date-input"
-          />
+          <input ref="dateInput" type="date" :value="item.watchDate ?? ''" @change="onWatchDateChange"
+            class="hidden-date-input" />
         </div>
         <p v-if="isOverdue" class="badge overdue-badge">Просрочено :-(</p>
       </div>
@@ -206,12 +198,7 @@ function openDatePicker() {
             –
           </button>
 
-          <button
-            type="button"
-            class="progress-btn"
-            :disabled="!canIncreaseProgress"
-            @click="incProgress"
-          >
+          <button type="button" class="progress-btn" :disabled="!canIncreaseProgress" @click="incProgress">
             +
           </button>
         </div>
@@ -227,35 +214,19 @@ function openDatePicker() {
         </button>
 
         <div class="secondary-actions">
-          <button
-            type="button"
-            @click="changeStatus('want')"
-            class="status-btn"
-          >
+          <button type="button" @click="changeStatus('want')" class="status-btn">
             Хочу
           </button>
 
-          <button
-            type="button"
-            @click="changeStatus('watching')"
-            class="status-btn"
-          >
+          <button type="button" @click="changeStatus('watching')" class="status-btn">
             Смотрю
           </button>
 
-          <button
-            type="button"
-            @click="changeStatus('done')"
-            class="status-btn"
-          >
+          <button type="button" @click="changeStatus('done')" class="status-btn">
             Готово
           </button>
 
-          <button
-            type="button"
-            @click="changeStatus('abandoned')"
-            class="status-btn"
-          >
+          <button type="button" @click="changeStatus('abandoned')" class="status-btn">
             Заброшено
           </button>
 
@@ -267,21 +238,20 @@ function openDatePicker() {
     </div>
   </article>
   <!--  модальное окно подтверждения удаления -->
+  <!-- модальное окно подтверждения удаления -->
   <Teleport to="body">
-    <div
-      v-if="showDeleteConfirm"
-      class="confirm-overlay"
-      @click.self="cancelDelete"
-    >
+    <div v-if="showDeleteConfirm" class="confirm-overlay" @click.self="cancelDelete">
       <div class="confirm-modal">
         <h3>Удаление медиа</h3>
         <p>
-          Вы точно хотите удалить <strong>{{ item.title }}</strong
-          >?
+          Вы точно хотите удалить <strong>{{ item.title }}</strong>?
         </p>
+
         <div class="confirm-actions">
-          <button type="button" class="btn-delete" @click="confirmDelete">Удалить</button>
-          <button type="button" class="status-btn" @click="cancelDelete">
+          <button type="button" class="btn danger" @click="confirmDelete">
+            Удалить
+          </button>
+          <button type="button" class="btn accent" @click="cancelDelete">
             Отмена
           </button>
         </div>
@@ -435,7 +405,8 @@ function openDatePicker() {
   flex-wrap: wrap;
   justify-content: center;
   align-items: flex-start;
-  gap: 0; /* убираем общий gap, теперь управляем через блоки */
+  gap: 0;
+  /* убираем общий gap, теперь управляем через блоки */
   margin-top: 12px;
 }
 
@@ -506,7 +477,7 @@ function openDatePicker() {
   font-weight: 600;
 }
 
-/* стили для модального окна подтверждения */
+/* 1:1 стили модального окна как в mediapage.vue */
 .confirm-overlay {
   position: fixed;
   top: 0;
@@ -549,6 +520,44 @@ function openDatePicker() {
   gap: 12px;
 }
 
+.btn {
+  border-radius: 999px;
+  height: 38px;
+  padding: 0 20px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.accent {
+  background: #fdb688;
+  color: #1a172c;
+  border: none;
+}
+
+.accent:hover {
+  background: #fdeabf;
+  transform: translateY(-1px);
+}
+
+.danger {
+  background: #fefefe;
+  color: #1a172c;
+  border: 1px solid #e5e5e5;
+}
+
+.danger:hover {
+  background: #c36b65;
+  border-color: #8b2424;
+  color: #fff;
+  transform: translateY(-1px);
+}
 
 
 @media (max-width: 768px) {
