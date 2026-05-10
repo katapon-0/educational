@@ -16,7 +16,8 @@ function getMedia() {
 }
 
 function getMediaById(id) {
-    return media.value.find(m => m.id == id)
+    if (id === null || id === undefined) return undefined;
+    return media.value.find(m => m.id == id);
 }
 
 function addMedia(item) {

@@ -29,7 +29,11 @@ const {
 // =========================
 // ТЕКУЩИЙ ОБЪЕКТ
 // =========================
-const item = computed(() => getMediaById(Number(route.params.id)));
+const item = computed(() => {
+  const id = Number(route.params.id);
+  if (!Number.isFinite(id)) return null;
+  return getMediaById(id) ?? null;
+});
 
 // =========================
 // РЕЖИМ РЕДАКТИРОВАНИЯ
@@ -300,7 +304,7 @@ function markAsWatched() {
           </p>
 
           <div class="meta">
-            <span v-if="item.type === 'film'"">
+            <span v-if="item.type === 'film'">
               {{ item.episodeDuration || item.duration || " ?" }} мин </span>
           </div>
 

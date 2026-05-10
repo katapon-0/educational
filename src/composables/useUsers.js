@@ -95,7 +95,7 @@ function register(newUser) {
     const userMediaCopy = structuredClone(defaultMedia)
     const maxId = Math.max(0, ...users.value.map(u => u.id || 0))
     const user = {
-        id: maxId +1,
+        id: maxId + 1,
         login: newUser.login,
         password: newUser.password,
         name: newUser.name || "",
@@ -147,9 +147,7 @@ function updateUserMedia(mediaList) {
 // =========================
 
 function addMediaToUser(item) {
-    if (!currentUser.value) {
-        return
-    }
+    if (!currentUser.value || !Array.isArray(currentUser.value.media)) return
 
     const media = currentUser.value.media
     if (!Array.isArray(media)) {
@@ -165,7 +163,7 @@ function addMediaToUser(item) {
         type: item.type || "film",
         description: item.description || "",
         status: item.status || "want",
-        watchDate: item.watchDate || null,  
+        watchDate: item.watchDate || null,
         link: item.link || null,
         episodeDuration: item.episodeDuration || null,
         totalEpisodes: item.totalEpisodes || null,
@@ -179,7 +177,7 @@ function addMediaToUser(item) {
 }
 
 function deleteMediaFromUser(id) {
-    if (!currentUser.value) return
+    if (!currentUser.value || !Array.isArray(currentUser.value.media)) return
 
     const media = currentUser.value.media.filter(m => m.id !== id)
 
@@ -187,7 +185,7 @@ function deleteMediaFromUser(id) {
 }
 
 function updateMediaInUser(id, data) {
-    if (!currentUser.value) return
+    if (!currentUser.value || !Array.isArray(currentUser.value.media)) return
 
     const media = currentUser.value.media.map(m =>
         m.id === id ? { ...m, ...data } : m
