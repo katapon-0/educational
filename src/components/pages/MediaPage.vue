@@ -184,31 +184,54 @@ function save() {
 // =========================
 // ПРОГРЕСС
 // =========================
+function syncStatusWithProgress(progress, total, currentStatus) {
+  if (progress === 0) return "want";
+  if (total && progress >= total) return "done";
+  return "watching";
+}
+
 function handleIncreaseProgress() {
   if (!item.value) return;
   if (item.value.type !== "series") return;
 
-  increaseProgress(item.value.id);
+  const total = item.value.totalEpisodes || 0;
+  const current = item.value.progress || 0;
 
-  const updatedItem = getMediaById(item.value.id);
+  const newProgress = total
+    ? Math.min(current + 1, total)
+    : current + 1;
 
-  // if (updatedItem?.progress >= updatedItem?.totalEpisodes) {
-  //   router.push({ name: "home" });
-  // }
+  const newStatus = syncStatusWithProgress(
+    newProgress,
+    total,
+    item.value.status
+  );
+
+  updateMedia(item.value.id, {
+    progress: newProgress,
+  });
+
+  updateStatus(item.value.id, newStatus);
 }
 
 function handleDecreaseProgress() {
   if (!item.value) return;
   if (item.value.type !== "series") return;
 
-  let newProgress = (item.value.progress || 0) - 1;
-  if (newProgress < 0) newProgress = 0;
+  const current = item.value.progress || 0;
+  const newProgress = Math.max(current - 1, 0);
 
-  updateMedia(item.value.id, { progress: newProgress });
+  const newStatus = syncStatusWithProgress(
+    newProgress,
+    item.value.totalEpisodes,
+    item.value.status
+  );
 
-  if (newProgress === 0) {
-    updateStatus(item.value.id, "want");
-  }
+  updateMedia(item.value.id, {
+    progress: newProgress,
+  });
+
+  updateStatus(item.value.id, newStatus);
 }
 
 // =========================
@@ -398,7 +421,7 @@ function markAsWatched() {
     </div>
 
 
-        <!-- модальное окно подтверждения удаления -->
+    <!-- модальное окно подтверждения удаления -->
     <Teleport to="body">
       <div v-if="showDeleteConfirm" class="confirm-overlay" @click.self="cancelDelete">
         <div class="confirm-modal">
@@ -944,10 +967,12 @@ textarea {
 .content-notfound {
   display: flex;
   flex-direction: column;
-  align-items: center;     /* горизонтальное центрирование */
+  align-items: center;
+  /* горизонтальное центрирование */
   text-align: center;
   max-width: 500px;
-  gap: 16px;              /* равномерное расстояние между элементами */
+  gap: 16px;
+  /* равномерное расстояние между элементами */
 }
 
 .code {
@@ -958,6 +983,7 @@ textarea {
   line-height: 1;
   font-family: var(--font-heading, Arial, sans-serif);
 }
+
 .message {
   font-size: 28px;
   font-weight: 600;
@@ -977,6 +1003,7 @@ textarea {
   transition: all 0.2s ease;
   box-shadow: 0 4px 12px rgba(26, 23, 44, 0.2);
 }
+
 .btn-home:hover {
   background: #2d2a44;
   transform: translateY(-2px);
