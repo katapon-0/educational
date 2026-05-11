@@ -151,12 +151,11 @@ button {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(26, 23, 44, 0.2);
 }
 
 button:hover {
   background: #2d2a44;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(26, 23, 44, 0.3);
+  /* transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(26, 23, 44, 0.3); */
 }
 </style>

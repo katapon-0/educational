@@ -487,7 +487,7 @@ function markAsWatched() {
 .btn-back:hover {
   background: #fdeabf;
   border-color: #fdb688;
-  transform: translateY(-1px);
+  /* transform: translateY(-1px); */
 }
 
 .card {
@@ -504,11 +504,11 @@ function markAsWatched() {
   transition: all 0.2s ease;
 }
 
-.card:hover {
+/* .card:hover {
   border-color: #1a172c;
   box-shadow: 0 10px 24px rgba(26, 23, 44, 0.08);
-  transform: translateY(-2px);
-}
+  transform: translateY(-2px); 
+} */
 
 .header {
   display: flex;
@@ -645,7 +645,7 @@ function markAsWatched() {
 
 .accent:hover {
   background: #fdeabf;
-  transform: translateY(-1px);
+  /* transform: translateY(-1px); */
 }
 
 .danger {
@@ -658,7 +658,7 @@ function markAsWatched() {
   background: #c36b65;
   border-color: #8b2424;
   color: #fff;
-  transform: translateY(-1px);
+  /* transform: translateY(-1px); */
 }
 
 .round {
@@ -1010,7 +1010,7 @@ textarea {
 
 .btn-home:hover {
   background: #2d2a44;
-  transform: translateY(-2px);
+  /* transform: translateY(-2px); */
 }
 
 @media (max-width: 768px) {

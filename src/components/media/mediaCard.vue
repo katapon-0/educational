@@ -311,11 +311,11 @@ function openDatePicker() {
   padding: 14px;
 }
 
-.card:hover {
+/* .card:hover {
   border-color: #1a172c;
   box-shadow: 0 6px 18px rgba(26, 23, 44, 0.08);
-  transform: translateY(-1px);
-}
+   transform: translateY(-1px); 
+} */
 
 .cover {
   width: 280px;
@@ -541,7 +541,7 @@ function openDatePicker() {
 
 .accent:hover {
   background: #fdeabf;
-  transform: translateY(-1px);
+  /* transform: translateY(-1px); */
 }
 
 .danger {
@@ -554,7 +554,7 @@ function openDatePicker() {
   background: #c36b65;
   border-color: #8b2424;
   color: #fff;
-  transform: translateY(-1px);
+  /* transform: translateY(-1px); */
 }
 
 

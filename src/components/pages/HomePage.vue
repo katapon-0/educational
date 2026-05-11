@@ -54,11 +54,7 @@ function handleDelete(id) {
     <div v-else>
       <!-- Рекомендация -->
       <div class="suggestion">
-        <img
-          src="../../assets/icons/suggetion.png"
-          class="suggestion-icon"
-          alt="icon"
-        />
+        <img src="../../assets/icons/suggetion.png" class="suggestion-icon" alt="icon" />
         <button @click="refreshSuggestion" class="btn-suggestion">
           Что посмотреть ?
         </button>
@@ -68,26 +64,18 @@ function handleDelete(id) {
           <img :src="suggestion.image" class="suggestion-poster" />
           <div class="suggestion-info">
             <strong>{{ suggestion.title }}</strong>
-            <span
-              >({{ suggestion.type === "series" ? "Сериал" : "Фильм" }})</span
-            >
+            <span>({{ suggestion.type === "series" ? "Сериал" : "Фильм" }})</span>
             <span v-if="suggestion.watchDate">
               {{ new Date(suggestion.watchDate).toLocaleDateString() }}
             </span>
-            <button
-              @click="router.push('/media/' + suggestion.id)"
-              class="btn-link"
-            >
+            <button @click="router.push('/media/' + suggestion.id)" class="btn-link">
               Перейти
             </button>
           </div>
         </div>
 
         <!-- Сообщение об отсутствии вариантов -->
-        <p
-          v-else-if="hasSuggestionRequested && !suggestion"
-          class="empty-suggestion"
-        >
+        <p v-else-if="hasSuggestionRequested && !suggestion" class="empty-suggestion">
           Нет доступных вариантов
         </p>
       </div>
@@ -180,6 +168,8 @@ function handleDelete(id) {
   border-radius: 12px;
   border: 1px solid #e5e5e5;
   color: #1a172c;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .suggestion {
@@ -205,16 +195,17 @@ function handleDelete(id) {
   background: #1a172c;
   color: #fefefe;
   border: none;
-  border-radius: 12px;
+  border-radius: 92px;
   padding: 12px 24px;
-  font-size: 20px;
+  font-size: 18px;
+  font-weight: 600;
+  font-family: var(--font-heading);
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .btn-suggestion:hover {
   opacity: 0.92;
-  transform: translateY(-2px);
 }
 
 .suggestion-card {
@@ -226,12 +217,8 @@ function handleDelete(id) {
   background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.65);
-  border-radius: 18px;
+  border-radius: 25px;
   padding: 16px;
-
-  box-shadow:
-    0 8px 24px rgba(26, 23, 44, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.55);
 
   flex: 1;
   min-width: 280px;
@@ -242,20 +229,20 @@ function handleDelete(id) {
     transform 0.25s ease,
     box-shadow 0.25s ease;
 }
-
+/* 
 .suggestion-card:hover {
   box-shadow:
     0 12px 28px rgba(26, 23, 44, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.6);
-}
+} */
 
 .suggestion-poster {
   width: 90px;
   height: 130px;
   object-fit: cover;
-  border-radius: 12px;
+  border-radius: 21px;
   background: #fdeabf;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  /* box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12); */
 }
 
 .suggestion-info {
@@ -268,9 +255,9 @@ function handleDelete(id) {
 }
 
 .suggestion-info strong {
-  font-size: 23px;
+  font-family: var(--font-heading);
+  font-size: 20px;
   font-weight: 700;
-  margin-bottom: 2px;
 }
 
 .suggestion-info span {
@@ -286,19 +273,18 @@ function handleDelete(id) {
   background: #1a172c;
   color: #fefefe;
   border: none;
-  border-radius: 10px;
+  border-radius: 17px;
   padding: 8px 14px;
 
   cursor: pointer;
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 600;
-
   transition: all 0.2s ease;
 }
 
 .btn-link:hover {
   opacity: 0.92;
-  transform: translateY(-1px);
+  /* transform: translateY(-1px); */
 }
 
 .empty-state {
@@ -306,6 +292,8 @@ function handleDelete(id) {
   padding: 60px;
   color: #1a172c;
   opacity: 0.5;
+  font-size: 15px;
+  line-height: 1.6;
 }
 
 .btn-primary {
@@ -334,6 +322,7 @@ function handleDelete(id) {
 }
 
 .guest-card {
+  font-family: var(--font-text);
   max-width: 520px;
   width: 100%;
   text-align: center;
@@ -354,9 +343,10 @@ function handleDelete(id) {
 }
 
 .guest-title {
-  font-size: 28px;
-  margin-bottom: 10px;
-  color: #1a172c;
+  font-family: var(--font-heading);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
 }
 
 .guest-subtitle {
@@ -377,13 +367,13 @@ function handleDelete(id) {
   padding: 12px 16px;
 
   border: none;
-  border-radius: 12px;
+  border-radius: 22px;
 
   background: #1a172c;
   color: #fefefe;
 
-  font-size: 15px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 600;
 
   cursor: pointer;
   transition: all 0.2s ease;
@@ -393,8 +383,8 @@ function handleDelete(id) {
 
 .guest-btn:hover {
   background: #2d2a44;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(26, 23, 44, 0.3);
+  /* transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(26, 23, 44, 0.3); */
 }
 
 @media (max-width: 768px) {

@@ -86,6 +86,8 @@ function closeEditModal() {
   background: #1a172c;
   color: #fefefe;
   border-radius: 0 0 14px 14px;
+
+  font-family: var(--font-text);
 }
 
 .topbar-inner {
@@ -104,19 +106,29 @@ function closeEditModal() {
 }
 
 .brand {
-  font-weight: 600;
-  font-size: 20px;
-  letter-spacing: 0.3px;
-  background: none;
-  border: none;
-  color: #fefefe;
-  cursor: pointer;
-  padding: 6px 10px;
-  border-radius: 8px;
-  transition: 0.2s;
   display: flex;
   align-items: center;
   gap: 8px;
+
+  background: none;
+  border: none;
+  cursor: pointer;
+
+  padding: 6px 10px;
+  border-radius: 8px;
+
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+
+  color: #fefefe;
+
+  transition: 0.2s;
+}
+
+.brand span {
+  font-family: var(--font-heading);
 }
 
 .brand:hover {
@@ -142,16 +154,26 @@ function closeEditModal() {
 }
 
 .username {
-  font-size: 17px;
+  font-family: var(--font-text);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
 }
 
 .btn {
   padding: 6px 12px;
+
   border: 1px solid rgba(197, 194, 210, 0.2);
   border-radius: 8px;
+
   background: transparent;
   color: #fefefe;
-  font-size: 15px;
+
+  font-family: var(--font-text);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -165,12 +187,12 @@ function closeEditModal() {
   background: #fdb688;
   color: #1a172c;
   border: none;
+
+  font-weight: 600;
 }
 
 .btn-accent:hover {
   background: #ffdac1;
-  border: 2px;
-  border-color: #fdb688;
 }
 
 .icon-btn {
@@ -180,14 +202,11 @@ function closeEditModal() {
   display: flex;
   align-items: center;
   justify-content: center;
- 
+
   background: transparent;
-  color: #fefefe;
-
   cursor: pointer;
-  transition: 0.2s ease;
 
-  font-size: 16px;
+  transition: 0.2s ease;
 }
 
 .icon-btn:hover {
@@ -219,17 +238,12 @@ function closeEditModal() {
   }
 
   .username {
-    display: none; 
-  }
-
-  .auth,
-  .user {
-    gap: 6px;
+    display: none;
   }
 
   .btn {
-    padding: 5px 8px;
     font-size: 13px;
+    padding: 5px 8px;
   }
 
   .btn-accent {
@@ -246,5 +260,4 @@ function closeEditModal() {
     height: 28px;
   }
 }
-
 </style>
